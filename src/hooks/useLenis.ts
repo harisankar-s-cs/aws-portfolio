@@ -1,14 +1,21 @@
 // src/hooks/useLenis.ts
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-export function useLenis() {
+let globalLenisInstance: Lenis | null = null
+
+export function getLenis(): Lenis | null {
+  return globalLenisInstance
+}
+
+export function useLenis(enabled: boolean = true) {
+  const lenisRef = useRef<Lenis | null>(null)
+
   useEffect(() => {
-    // Check for prefers-reduced-motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {
       return
@@ -23,6 +30,13 @@ export function useLenis() {
       wheelMultiplier: 0.9,
     })
 
+    globalLenisInstance = lenis
+    lenisRef.current = lenis
+
+    if (!enabled) {
+      lenis.stop()
+    }
+
     lenis.on('scroll', ScrollTrigger.update)
 
     const tickerCallback = (time: number) => {
@@ -35,6 +49,18 @@ export function useLenis() {
     return () => {
       gsap.ticker.remove(tickerCallback)
       lenis.destroy()
+      globalLenisInstance = null
     }
   }, [])
+
+  useEffect(() => {
+    if (!lenisRef.current) return
+    if (enabled) {
+      lenisRef.current.start()
+    } else {
+      lenisRef.current.stop()
+    }
+  }, [enabled])
+
+  return lenisRef
 }

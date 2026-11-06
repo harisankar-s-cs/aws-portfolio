@@ -5,14 +5,16 @@ import { useLenis } from './hooks/useLenis'
 import { useDialogue } from './hooks/useDialogue'
 import { CustomCursor } from './components/common/CustomCursor'
 import { DialogueToast } from './components/common/DialogueToast'
-import { IntroGate } from './components/intro/IntroGate'
+import { LampIntro } from './components/intro/LampIntro'
 import { Home } from './components/routes/Home'
 import { CaseStudy } from './components/routes/CaseStudy'
 
 export default function App() {
   const [introCompleted, setIntroCompleted] = useState(() => {
     try {
-      return sessionStorage.getItem('cinematic_intro_completed') === 'true'
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('skipIntro') === 'true') return true
+      return sessionStorage.getItem('lamp_intro_completed') === 'true'
     } catch (err) {
       return false
     }
@@ -20,26 +22,12 @@ export default function App() {
   const [reducedEffects, setReducedEffects] = useState(false)
   const { toast, triggerDialogue } = useDialogue()
 
-  // Initialize synchronized Lenis + GSAP ScrollTrigger
-  useLenis()
-
-  // Keyboard shortcut: Escape skips intro
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        try {
-          sessionStorage.setItem('cinematic_intro_completed', 'true')
-        } catch (err) {}
-        setIntroCompleted(true)
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  // Initialize synchronized Lenis + GSAP ScrollTrigger (enabled only after intro finishes)
+  useLenis(introCompleted)
 
   const handleReplayIntro = () => {
     try {
-      sessionStorage.removeItem('cinematic_intro_completed')
+      sessionStorage.removeItem('lamp_intro_completed')
     } catch (err) {}
     setIntroCompleted(false)
     window.scrollTo(0, 0)
@@ -58,9 +46,9 @@ export default function App() {
         {/* Custom GSAP Physics Cursor (auto-disabled on touch) */}
         {!reducedEffects && <CustomCursor />}
 
-        {/* Cinematic Film-like Lamp Intro Sequence */}
+        {/* The Lamp Signature Preload + Hanging Cord + Light Front Reveal */}
         {!introCompleted && (
-          <IntroGate onComplete={() => setIntroCompleted(true)} />
+          <LampIntro onComplete={() => setIntroCompleted(true)} />
         )}
 
         {/* Global Dialogue Microcopy Toast */}

@@ -1,13 +1,14 @@
 // src/components/routes/Home.tsx
 import React from 'react'
 import { Hero } from '../sections/Hero'
-import { StoryScroller } from '../sections/StoryScroller'
+import { Prologue } from '../sections/Prologue'
 import { SelectedWork } from '../sections/SelectedWork'
 import { Toolkit } from '../sections/Toolkit'
 import { Journey } from '../sections/Journey'
-import { Architecture } from '../sections/Architecture'
+import { UnderTheHood } from '../sections/UnderTheHood'
 import { Contact } from '../sections/Contact'
 import { Footer } from '../sections/Footer'
+import { LightPool } from '../common/LightPool'
 
 interface HomeProps {
   reducedEffects: boolean
@@ -34,36 +35,63 @@ export function Home({
             </span>
           </a>
 
-          <nav className="hidden md:flex items-center gap-8 font-mono text-xs text-muted">
+          <nav className="hidden md:flex items-center gap-7 font-mono text-xs text-muted">
+            <a href="#prologue" className="hover:text-bone transition-colors">Prologue</a>
             <a href="#work" className="hover:text-bone transition-colors">Selected Work</a>
             <a href="#toolkit" className="hover:text-bone transition-colors">Toolkit</a>
             <a href="#journey" className="hover:text-bone transition-colors">Journey</a>
-            <a href="#architecture" className="hover:text-bone transition-colors flex items-center gap-1.5 text-bone">
+            <a href="#under-the-hood" className="hover:text-bone transition-colors flex items-center gap-1.5 text-bone">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp" />
-              <span>AWS Architecture</span>
+              <span>Under the hood</span>
             </a>
             <a href="#contact" className="hover:text-bone transition-colors">Contact</a>
           </nav>
 
           <div className="flex items-center gap-4 text-xs font-mono">
+            {/* Built on AWS chip */}
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#171513] border border-hairlineLight text-[11px] text-muted">
+              <span className="text-[#FF9900] font-bold">AWS</span>
+              <span>Amplify Gen 2</span>
+            </div>
+
             <button
               onClick={onReplayIntro}
-              className="px-3 py-1 rounded border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer"
-              title="Replay cinematic oil lamp ignition"
+              className="px-3 py-1 rounded border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer text-[11px]"
+              title="Replay cinematic lamp sequence"
             >
-              Replay Intro
+              Replay Lamp
             </button>
           </div>
         </div>
       </header>
 
+      {/* Main Narrative Flow */}
       <Hero onTriggerDialogue={onTriggerDialogue} />
-      <StoryScroller />
-      <SelectedWork />
-      <Toolkit onTriggerDialogue={onTriggerDialogue} />
-      <Journey />
-      <Architecture />
-      <Contact onTriggerDialogue={onTriggerDialogue} />
+
+      <LightPool id="prologue-pool">
+        <Prologue />
+      </LightPool>
+
+      <LightPool id="work-pool">
+        <SelectedWork />
+      </LightPool>
+
+      <LightPool id="toolkit-pool">
+        <Toolkit onTriggerDialogue={onTriggerDialogue} />
+      </LightPool>
+
+      <LightPool id="journey-pool">
+        <Journey />
+      </LightPool>
+
+      <LightPool id="hood-pool">
+        <UnderTheHood />
+      </LightPool>
+
+      <LightPool id="contact-pool">
+        <Contact onTriggerDialogue={onTriggerDialogue} />
+      </LightPool>
+
       <Footer
         reducedEffects={reducedEffects}
         onToggleReducedEffects={onToggleReducedEffects}
