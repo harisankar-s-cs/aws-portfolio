@@ -79,11 +79,6 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
                   }}
                 />
               )}
-
-              {/* Pill Name Badge at Top of Round Frame */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 font-mono text-xs uppercase tracking-wider bg-background/90 text-amber-lamp px-3.5 py-1 rounded-full border border-hairlineLight font-bold whitespace-nowrap shadow-md">
-                Harisankar S.
-              </div>
             </div>
           </div>
 
