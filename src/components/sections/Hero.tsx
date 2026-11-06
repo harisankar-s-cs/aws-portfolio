@@ -3,7 +3,11 @@ import React, { useState, useRef } from 'react'
 import { personal } from '../../content/personal'
 import { dialogues } from '../../content/dialogues'
 
-export function Hero() {
+interface HeroProps {
+  onTriggerDialogue?: (key: string, quote: string) => void
+}
+
+export function Hero({ onTriggerDialogue }: HeroProps) {
   const [faceCaption, setFaceCaption] = useState<string | null>(null)
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
   const lastCaptionTimeRef = useRef<number>(0)
@@ -118,6 +122,27 @@ export function Hero() {
               <span className="text-amber-lamp font-bold">// 03</span>
               <span>AWS Cloud Deployment</span>
             </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="pt-4 flex flex-wrap items-center gap-4 text-xs font-mono">
+            <a
+              href="#work"
+              className="px-5 py-2.5 rounded-full bg-amber-lamp text-background font-bold uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-lamp/20"
+              data-cursor="VIEW"
+            >
+              Explore Work ↓
+            </a>
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              onMouseEnter={() => onTriggerDialogue?.('resumeDownload', dialogues.resumeDownload)}
+              className="px-5 py-2.5 rounded-full border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer"
+              data-cursor="RESUME"
+            >
+              Resume [PDF] ↗
+            </a>
           </div>
         </div>
 

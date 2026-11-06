@@ -57,7 +57,7 @@ export function Home({
         </div>
       </header>
 
-      <Hero />
+      <Hero onTriggerDialogue={onTriggerDialogue} />
       <StoryScroller />
       <SelectedWork />
       <Toolkit onTriggerDialogue={onTriggerDialogue} />

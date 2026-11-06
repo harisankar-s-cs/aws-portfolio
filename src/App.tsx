@@ -10,7 +10,13 @@ import { Home } from './components/routes/Home'
 import { CaseStudy } from './components/routes/CaseStudy'
 
 export default function App() {
-  const [introCompleted, setIntroCompleted] = useState(false)
+  const [introCompleted, setIntroCompleted] = useState(() => {
+    try {
+      return sessionStorage.getItem('cinematic_intro_completed') === 'true'
+    } catch (err) {
+      return false
+    }
+  })
   const [reducedEffects, setReducedEffects] = useState(false)
   const { toast, triggerDialogue } = useDialogue()
 
@@ -73,7 +79,7 @@ export default function App() {
               />
             }
           />
-          <Route path="/work/:slug" element={<CaseStudy />} />
+          <Route path="/work/:slug" element={<CaseStudy onTriggerDialogue={triggerDialogue} />} />
           <Route
             path="*"
             element={

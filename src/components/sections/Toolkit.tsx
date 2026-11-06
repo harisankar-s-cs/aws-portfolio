@@ -1,6 +1,7 @@
 // src/components/sections/Toolkit.tsx
 import React, { useState } from 'react'
-import { toolkit, ToolGroup, ToolItem } from '../../content/toolkit'
+import { toolkit } from '../../content/toolkit'
+import type { ToolGroup, ToolItem } from '../../content/toolkit'
 import { dialogues } from '../../content/dialogues'
 
 interface ToolkitProps {

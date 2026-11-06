@@ -1,7 +1,8 @@
 // src/components/sections/SelectedWork.tsx
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { projects, Project } from '../../content/projects'
+import { projects } from '../../content/projects'
+import type { Project } from '../../content/projects'
 import { Hairline } from '../common/Hairline'
 
 export function SelectedWork() {

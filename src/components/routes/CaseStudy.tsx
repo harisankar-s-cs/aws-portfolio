@@ -1,10 +1,16 @@
 // src/components/routes/CaseStudy.tsx
 import React, { useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { projects, Project } from '../../content/projects'
+import { projects } from '../../content/projects'
+import type { Project } from '../../content/projects'
+import { dialogues } from '../../content/dialogues'
 import { Hairline } from '../common/Hairline'
 
-export function CaseStudy() {
+interface CaseStudyProps {
+  onTriggerDialogue?: (key: string, quote: string) => void
+}
+
+export function CaseStudy({ onTriggerDialogue }: CaseStudyProps) {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const project = projects.find((p) => p.slug === slug)
@@ -124,23 +130,32 @@ export function CaseStudy() {
       </div>
 
       {/* Footer Navigation */}
-      <div className="pt-12 hairline-t flex justify-between items-center font-mono text-xs">
+      <div className="pt-12 hairline-t flex flex-wrap justify-between items-center gap-4 font-mono text-xs">
         <button
           onClick={() => navigate('/')}
           className="text-amber-lamp hover:underline cursor-pointer"
         >
           ← Return to All Projects
         </button>
-        {project.githubUrl && (
-          <a
-            href={project.githubUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-bone hover:text-amber-lamp transition-colors"
+        <div className="flex items-center gap-4">
+          <button
+            onMouseEnter={() => onTriggerDialogue?.('restrictedItem', dialogues.restrictedItem)}
+            className="text-muted hover:text-amber-lamp transition-colors cursor-help border border-hairline px-3 py-1 rounded"
+            title="Institutional NDA / Peer Review restricted access"
           >
-            Inspect GitHub Code ↗
-          </a>
-        )}
+            Model Weights [Restricted]
+          </button>
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-bone hover:text-amber-lamp transition-colors"
+            >
+              Inspect GitHub Code ↗
+            </a>
+          )}
+        </div>
       </div>
 
     </div>

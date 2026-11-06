@@ -44,6 +44,8 @@ export function LampShaderCanvas({ intensity }: LampShaderCanvasProps) {
       precision mediump float;
       uniform float uTime;
       uniform float uIntensity;
+      uniform vec2 uResolution;
+      uniform vec2 uImageResolution;
       uniform sampler2D uTexture;
       uniform int uHasTexture;
       varying vec2 vUv;
@@ -77,26 +79,42 @@ export function LampShaderCanvas({ intensity }: LampShaderCanvasProps) {
 
       void main() {
         vec2 uv = vUv;
+        float screenAspect = uResolution.x / max(1.0, uResolution.y);
 
         // Organic candle / oil lamp flicker
-        float noise = snoise(vec2(uTime * 3.8, 0.0));
-        float dips = smoothstep(0.65, 0.9, snoise(vec2(uTime * 1.8, 3.0))) * -0.3;
-        float flameFlicker = 1.0 + (noise * 0.15) + dips;
+        float noise = snoise(vec2(uTime * 4.2, 0.0));
+        float dips = smoothstep(0.65, 0.9, snoise(vec2(uTime * 1.8, 3.0))) * -0.32;
+        float flameFlicker = 1.0 + (noise * 0.16) + dips;
+        float effIntensity = clamp(uIntensity * flameFlicker, 0.0, 1.3);
 
-        float effIntensity = clamp(uIntensity * flameFlicker, 0.0, 1.25);
+        // Radial light spotlight centered in viewport
+        vec2 centerOffset = uv - vec2(0.5, 0.5);
+        vec2 circlePos = vec2(centerOffset.x * screenAspect, centerOffset.y);
+        float dist = length(circlePos);
 
-        // Radial light mask expanding from upper center
-        vec2 lampCenter = vec2(0.5, 0.48);
-        float dist = length(uv - lampCenter);
         float radialLight = smoothstep(0.85 * effIntensity, 0.02, dist);
+        float flameCore = smoothstep(0.20 * effIntensity, 0.0, dist);
 
-        // Core flame halo
-        float flameCore = smoothstep(0.18 * effIntensity, 0.0, dist);
+        // Centered aspect-ratio preserved portrait mapping
+        float imgAspect = uImageResolution.x / max(1.0, uImageResolution.y);
+        vec2 pUv = centerOffset;
+        if (screenAspect > imgAspect) {
+          pUv.x *= (screenAspect / imgAspect);
+        } else {
+          pUv.y *= (imgAspect / screenAspect);
+        }
+        // Size portrait comfortably in viewport
+        pUv *= 1.85;
+        pUv += 0.5;
 
-        // Sample portrait
-        vec3 texColor = vec3(0.08, 0.07, 0.06);
-        if (uHasTexture == 1) {
-          texColor = texture2D(uTexture, uv).rgb;
+        vec3 texColor = vec3(0.07, 0.06, 0.05);
+        float insidePhoto = 0.0;
+        if (pUv.x >= 0.0 && pUv.x <= 1.0 && pUv.y >= 0.0 && pUv.y <= 1.0) {
+          if (uHasTexture == 1) {
+            texColor = texture2D(uTexture, pUv).rgb;
+            vec2 edgeDist = min(pUv, 1.0 - pUv);
+            insidePhoto = smoothstep(0.0, 0.08, min(edgeDist.x, edgeDist.y));
+          }
         }
 
         // Palette colors
@@ -104,15 +122,17 @@ export function LampShaderCanvas({ intensity }: LampShaderCanvasProps) {
         vec3 bgNearBlack = vec3(0.043, 0.039, 0.035); // #0B0A09
 
         // Lit portrait blending
-        vec3 litPortrait = mix(texColor * 0.1, texColor * 1.15 + amberColor * 0.2, radialLight);
-        vec3 finalColor = mix(bgNearBlack, litPortrait, radialLight * smoothstep(0.0, 0.12, effIntensity));
+        vec3 litPortrait = mix(texColor * 0.12, texColor * 1.15 + amberColor * 0.22, radialLight);
+        vec3 backdrop = mix(bgNearBlack, bgNearBlack + amberColor * 0.08 * effIntensity, flameCore);
+        vec3 sceneColor = mix(backdrop, litPortrait, insidePhoto);
 
-        // Add warm golden flame core glow
-        finalColor += amberColor * flameCore * 0.35 * effIntensity;
+        // Warm ambient exposure
+        vec3 finalColor = mix(bgNearBlack, sceneColor, radialLight * smoothstep(0.0, 0.08, effIntensity));
+        finalColor += amberColor * flameCore * 0.38 * effIntensity;
 
         // Subtle 35mm analogue grain
-        float grain = (fract(sin(dot(uv + uTime * 0.01, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.03;
-        finalColor += grain * radialLight;
+        float grain = (fract(sin(dot(uv + uTime * 0.015, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.035;
+        finalColor += grain * (radialLight + 0.05);
 
         gl_FragColor = vec4(finalColor, 1.0);
       }
@@ -148,6 +168,8 @@ export function LampShaderCanvas({ intensity }: LampShaderCanvasProps) {
     // Uniform locations
     const uTime = gl.getUniformLocation(program, 'uTime')
     const uIntensity = gl.getUniformLocation(program, 'uIntensity')
+    const uResolution = gl.getUniformLocation(program, 'uResolution')
+    const uImageResolution = gl.getUniformLocation(program, 'uImageResolution')
     const uHasTexture = gl.getUniformLocation(program, 'uHasTexture')
 
     // WebGL Texture
@@ -163,7 +185,7 @@ export function LampShaderCanvas({ intensity }: LampShaderCanvasProps) {
 
     let textureLoaded = false
     const updateTextureIfReady = () => {
-      if (imageRef.current && !textureLoaded) {
+      if (imageRef.current && !textureLoaded && imageRef.current.complete && imageRef.current.naturalWidth > 0) {
         gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageRef.current)
         textureLoaded = true
@@ -186,6 +208,12 @@ export function LampShaderCanvas({ intensity }: LampShaderCanvasProps) {
       const elapsed = (now - startTime) * 0.001
       gl.uniform1f(uTime, elapsed)
       gl.uniform1f(uIntensity, intensityRef.current)
+      gl.uniform2f(uResolution, canvas.width, canvas.height)
+      
+      const imgW = imageRef.current?.naturalWidth || 600
+      const imgH = imageRef.current?.naturalHeight || 750
+      gl.uniform2f(uImageResolution, imgW, imgH)
+      
       gl.uniform1i(uHasTexture, textureLoaded ? 1 : 0)
 
       gl.drawArrays(gl.TRIANGLES, 0, 6)

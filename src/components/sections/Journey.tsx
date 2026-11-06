@@ -1,6 +1,7 @@
 // src/components/sections/Journey.tsx
 import React from 'react'
-import { journey, JourneyItem } from '../../content/journey'
+import { journey } from '../../content/journey'
+import type { JourneyItem } from '../../content/journey'
 
 export function Journey() {
   return (

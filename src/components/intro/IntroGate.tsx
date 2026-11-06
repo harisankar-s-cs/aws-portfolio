@@ -67,6 +67,9 @@ export function IntroGate({ onComplete }: IntroGateProps) {
 
     // Finish sequence at 4.5s
     const finishTimer = setTimeout(() => {
+      try {
+        sessionStorage.setItem('cinematic_intro_completed', 'true')
+      } catch (e) {}
       onComplete()
     }, 4500)
 
@@ -117,6 +120,9 @@ export function IntroGate({ onComplete }: IntroGateProps) {
     if (audioContextRef.current) {
       try { audioContextRef.current.close() } catch (e) {}
     }
+    try {
+      sessionStorage.setItem('cinematic_intro_completed', 'true')
+    } catch (e) {}
     onComplete()
   }
 
