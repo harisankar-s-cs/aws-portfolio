@@ -22,161 +22,116 @@ import {
   Brain,
   Sliders,
   X,
-  Volume2,
-  VolumeX,
-  Zap,
-  Lightbulb,
-  Sun,
-  Moon,
+  Play,
   RotateCcw
 } from 'lucide-react'
-import confetti from 'canvas-confetti'
-
-// Web Audio API Synthesizer: Electrical Arc, Lamp Buzz & Switch Snaps
-const playElectricSound = (type = 'click', soundEnabled = true) => {
-  if (!soundEnabled) return
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
-    const now = ctx.currentTime
-
-    if (type === 'flicker') {
-      // Electrical arc crackle & filament strike
-      for (let i = 0; i < 4; i++) {
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.type = 'sawtooth'
-        osc.frequency.setValueAtTime(80 + Math.random() * 240, now + i * 0.09)
-        gain.gain.setValueAtTime(0.18, now + i * 0.09)
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.06)
-        osc.start(now + i * 0.09)
-        osc.stop(now + i * 0.09 + 0.07)
-      }
-
-      // Warm transformer power hum
-      const humOsc = ctx.createOscillator()
-      const humGain = ctx.createGain()
-      humOsc.connect(humGain)
-      humGain.connect(ctx.destination)
-      humOsc.type = 'sine'
-      humOsc.frequency.setValueAtTime(60, now + 0.4) // 60Hz mains hum
-      humGain.gain.setValueAtTime(0.001, now + 0.4)
-      humGain.gain.linearRampToValueAtTime(0.08, now + 0.6)
-      humGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2)
-      humOsc.start(now + 0.4)
-      humOsc.stop(now + 1.2)
-    } else if (type === 'switch') {
-      // Crisp mechanical rotary or toggle click
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.type = 'triangle'
-      osc.frequency.setValueAtTime(950, now)
-      gain.gain.setValueAtTime(0.15, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
-      osc.start(now)
-      osc.stop(now + 0.04)
-    } else if (type === 'fanfare') {
-      const notes = [523.25, 659.25, 783.99, 1046.5]
-      notes.forEach((freq, idx) => {
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.type = 'sine'
-        osc.frequency.setValueAtTime(freq, now + idx * 0.07)
-        gain.gain.setValueAtTime(0.08, now + idx * 0.07)
-        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.25)
-        osc.start(now + idx * 0.07)
-        osc.stop(now + idx * 0.07 + 0.25)
-      })
-    }
-  } catch (e) {
-    // AudioContext blocked
-  }
-}
 
 export default function App() {
-  // Light States:
-  // introState: 'dark' | 'flickering' | 'illuminated'
-  const [introState, setIntroState] = useState('dark')
-  const [lampTemperature, setLampTemperature] = useState('warm') // 'warm' (tungsten amber) | 'arc' (electric cyan)
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const [flickerIntensity, setFlickerIntensity] = useState(0) // 0 to 1
+  // Pre-render Cinematic Intro State
+  const [introFinished, setIntroFinished] = useState(false)
+  const [introProgress, setIntroProgress] = useState(0)
   const [showArchModal, setShowArchModal] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
 
-  // Interactive Denoising Lab State
-  const [noiseLevel, setNoiseLevel] = useState(65)
+  // Interactive Denoising Lab State (NIT Calicut Research)
+  const [noiseLevel, setNoiseLevel] = useState(55)
   const [patchSize, setPatchSize] = useState(256)
-  const canvasRef = useRef(null)
+  const labCanvasRef = useRef(null)
+  const ambientCanvasRef = useRef(null)
 
-  // Trigger the Cinematic Lamp Strike
-  const triggerLampStrike = () => {
-    if (introState === 'flickering') return
-    setIntroState('flickering')
-    playElectricSound('switch', soundEnabled)
-    playElectricSound('flicker', soundEnabled)
+  // Cinematic Intro Animation Timeline
+  useEffect(() => {
+    let current = 0
+    const interval = setInterval(() => {
+      current += Math.floor(Math.random() * 8) + 4
+      if (current >= 100) {
+        current = 100
+        setIntroProgress(100)
+        clearInterval(interval)
+        setTimeout(() => {
+          setIntroFinished(true)
+        }, 500)
+      } else {
+        setIntroProgress(current)
+      }
+    }, 45)
 
-    // Realistic multi-stage electrical flicker sequence
-    const flickerSteps = [
-      { delay: 100, intensity: 0.3 },
-      { delay: 220, intensity: 0.0 },
-      { delay: 350, intensity: 0.75 },
-      { delay: 480, intensity: 0.15 },
-      { delay: 600, intensity: 0.95 },
-      { delay: 750, intensity: 0.4 },
-      { delay: 900, intensity: 1.0 }
-    ]
+    return () => clearInterval(interval)
+  }, [])
 
-    flickerSteps.forEach((step) => {
-      setTimeout(() => {
-        setFlickerIntensity(step.intensity)
-      }, step.delay)
-    })
-
-    setTimeout(() => {
-      setIntroState('illuminated')
-      setFlickerIntensity(1)
-      confetti({
-        particleCount: 50,
-        spread: 70,
-        origin: { y: 0.4 },
-        colors: lampTemperature === 'warm' ? ['#f59e0b', '#fbbf24', '#f97316'] : ['#06b6d4', '#38bdf8', '#3b82f6']
-      })
-    }, 950)
+  // Skip Intro if user clicks anywhere
+  const skipIntro = () => {
+    setIntroProgress(100)
+    setIntroFinished(true)
   }
 
-  // Toggle Lamp On/Off after illuminated
-  const toggleLamp = () => {
-    if (introState === 'illuminated') {
-      playElectricSound('switch', soundEnabled)
-      setIntroState('dark')
-      setFlickerIntensity(0)
-    } else {
-      triggerLampStrike()
+  // 60FPS Cinematic Atmospheric Canvas (Fluid ambient light rays & drifting bokeh)
+  useEffect(() => {
+    const canvas = ambientCanvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    let animationFrameId
+    let width = (canvas.width = window.innerWidth)
+    let height = (canvas.height = window.innerHeight)
+
+    const handleResize = () => {
+      if (!canvas) return
+      width = canvas.width = window.innerWidth
+      height = canvas.height = window.innerHeight
     }
-  }
+    window.addEventListener('resize', handleResize)
 
-  // Toggle color temperature: Warm 2700K Edison vs Electric 6500K Cyan Arc
-  const toggleTemperature = () => {
-    playElectricSound('switch', soundEnabled)
-    const next = lampTemperature === 'warm' ? 'arc' : 'warm'
-    setLampTemperature(next)
-  }
+    // Floating ambient light particles
+    const particles = Array.from({ length: 32 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 2.5 + 1,
+      speedX: (Math.random() - 0.5) * 0.35,
+      speedY: (Math.random() - 0.5) * 0.35,
+      opacity: Math.random() * 0.5 + 0.2
+    }))
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText('harisankar.s.cs@gmail.com')
-    setCopiedEmail(true)
-    playElectricSound('switch', soundEnabled)
-    setTimeout(() => setCopiedEmail(false), 2000)
-  }
+    const render = () => {
+      ctx.clearRect(0, 0, width, height)
+
+      // Draw subtle cinematic anamorphic light gradient
+      const gradient = ctx.createRadialGradient(width / 2, 200, 50, width / 2, 300, width * 0.8)
+      gradient.addColorStop(0, 'rgba(217, 119, 6, 0.08)') // Warm amber center
+      gradient.addColorStop(0.5, 'rgba(14, 165, 233, 0.04)') // Subtle cool cyan rim
+      gradient.addColorStop(1, 'transparent')
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, width, height)
+
+      // Animate floating bokeh orbs
+      particles.forEach((p) => {
+        p.x += p.speedX
+        p.y += p.speedY
+
+        if (p.x < 0) p.x = width
+        if (p.x > width) p.x = 0
+        if (p.y < 0) p.y = height
+        if (p.y > height) p.y = 0
+
+        ctx.fillStyle = `rgba(245, 158, 11, ${p.opacity * 0.4})`
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+        ctx.fill()
+      })
+
+      animationFrameId = requestAnimationFrame(render)
+    }
+
+    render()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(animationFrameId)
+    }
+  }, [])
 
   // Draw interactive simulation on the canvas representing Harisankar's NIT Calicut Restormer
   useEffect(() => {
-    const canvas = canvasRef.current
+    const canvas = labCanvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     const width = canvas.width
@@ -186,23 +141,23 @@ export default function App() {
 
     // Synthetic ultrasound anatomical tissue gradient
     const gradient = ctx.createRadialGradient(width / 2, height / 2, 20, width / 2, height / 2, 140)
-    gradient.addColorStop(0, lampTemperature === 'warm' ? '#fbbf24' : '#38bdf8')
-    gradient.addColorStop(0.4, '#1e293b')
+    gradient.addColorStop(0, '#f59e0b')
+    gradient.addColorStop(0.35, '#334155')
     gradient.addColorStop(1, '#020617')
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, width, height)
 
-    // Ultrasound tissue boundaries
-    ctx.strokeStyle = lampTemperature === 'warm' ? '#f59e0b' : '#38bdf8'
-    ctx.lineWidth = 3
+    // Tissue contour lines
+    ctx.strokeStyle = '#fbbf24'
+    ctx.lineWidth = 2.5
     ctx.beginPath()
-    ctx.arc(width / 2, height / 2, 60, 0, Math.PI * 2)
+    ctx.arc(width / 2, height / 2, 58, 0, Math.PI * 2)
     ctx.stroke()
 
-    ctx.strokeStyle = '#f43f5e'
-    ctx.lineWidth = 2
+    ctx.strokeStyle = '#38bdf8'
+    ctx.lineWidth = 1.5
     ctx.beginPath()
-    ctx.ellipse(width / 2 - 20, height / 2 + 10, 35, 20, Math.PI / 4, 0, Math.PI * 2)
+    ctx.ellipse(width / 2 - 18, height / 2 + 8, 36, 18, Math.PI / 4, 0, Math.PI * 2)
     ctx.stroke()
 
     // Add noise layer based on noiseLevel slider
@@ -221,7 +176,7 @@ export default function App() {
     ctx.putImageData(imgData, 0, 0)
 
     // Patch Boundary Grid overlay
-    ctx.strokeStyle = lampTemperature === 'warm' ? 'rgba(251, 191, 36, 0.4)' : 'rgba(56, 189, 248, 0.4)'
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.35)'
     ctx.lineWidth = 1
     const step = patchSize === 128 ? 32 : patchSize === 256 ? 64 : 96
     for (let x = 0; x < width; x += step) {
@@ -236,98 +191,86 @@ export default function App() {
       ctx.lineTo(width, y)
       ctx.stroke()
     }
-  }, [noiseLevel, patchSize, lampTemperature])
+  }, [noiseLevel, patchSize])
 
   const calculatedPSNR = (42 - (noiseLevel * 0.22)).toFixed(2)
   const calculatedSSIM = (0.99 - (noiseLevel * 0.005)).toFixed(3)
 
-  // Color theme tokens based on lamp temperature
-  const glowColor = lampTemperature === 'warm' ? 'rgba(245, 158, 11, ' : 'rgba(6, 182, 212, '
-  const accentText = lampTemperature === 'warm' ? 'text-amber-400' : 'text-cyan-400'
-  const accentBg = lampTemperature === 'warm' ? 'bg-amber-500' : 'bg-cyan-500'
-  const accentBorder = lampTemperature === 'warm' ? 'border-amber-500/40' : 'border-cyan-500/40'
+  const copyEmail = () => {
+    navigator.clipboard.writeText('harisankar.s.cs@gmail.com')
+    setCopiedEmail(true)
+    setTimeout(() => setCopiedEmail(false), 2000)
+  }
 
   return (
-    <div className="min-h-screen bg-black text-slate-100 font-sans selection:bg-amber-500 selection:text-black overflow-x-hidden relative">
-
-      {/* =========================================================================
-          CINEMATIC LIGHT OVERLAY & SPOTLIGHT ENGINE
-          Calculates dynamic opacity based on filament flicker intensity
-      ========================================================================= */}
-      <div 
-        className="fixed inset-0 pointer-events-none transition-opacity duration-150 z-20"
-        style={{
-          opacity: introState === 'illuminated' ? 1 : flickerIntensity,
-          background: `
-            radial-gradient(circle at 50% 120px, ${glowColor}0.35) 0%, transparent 65%),
-            radial-gradient(circle at 50% 400px, ${glowColor}0.15) 0%, transparent 75%)
-          `
-        }}
+    <div className="min-h-screen bg-[#09090b] text-stone-100 font-sans selection:bg-amber-500 selection:text-black relative overflow-x-hidden">
+      
+      {/* Dynamic 60FPS Ambient Light Canvas */}
+      <canvas
+        ref={ambientCanvasRef}
+        className="fixed inset-0 pointer-events-none z-0"
       />
 
-      {/* Darkness Curtain for Unlit Mode */}
-      {introState !== 'illuminated' && (
+      {/* =========================================================================
+          CINEMATIC PRE-RENDER OPENING CURTAIN
+      ========================================================================= */}
+      {!introFinished && (
         <div 
-          className="fixed inset-0 z-30 flex flex-col items-center justify-center bg-black/95 backdrop-blur-sm transition-opacity duration-300"
-          style={{ opacity: 1 - flickerIntensity * 0.7 }}
+          onClick={skipIntro}
+          className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-between p-8 sm:p-12 cursor-pointer transition-opacity duration-700 select-none"
         >
-          {/* Hanging Edison Bulb in Darkness */}
-          <div className="flex flex-col items-center cursor-pointer group" onClick={triggerLampStrike}>
-            {/* Cord */}
-            <div className="w-0.5 h-24 bg-gradient-to-b from-stone-600 to-stone-400" />
-            {/* Socket */}
-            <div className="w-6 h-6 bg-amber-700/80 rounded-t-sm border border-amber-600/60 shadow-inner" />
-            
-            {/* Bulb Glass */}
-            <div className="relative w-16 h-24 -mt-1 flex items-center justify-center">
-              <div 
-                className="w-14 h-20 rounded-full border border-amber-500/30 transition-all duration-150 flex items-center justify-center"
-                style={{
-                  boxShadow: flickerIntensity > 0 
-                    ? `0 0 ${flickerIntensity * 80}px ${flickerIntensity * 30}px ${glowColor}0.8)` 
-                    : 'none',
-                  backgroundColor: flickerIntensity > 0 
-                    ? `${glowColor}${flickerIntensity * 0.7})` 
-                    : 'rgba(255, 255, 255, 0.03)'
-                }}
-              >
-                {/* Internal Filament Wire */}
-                <div 
-                  className="w-4 h-8 rounded-full border-2 transition-all duration-100"
-                  style={{
-                    borderColor: flickerIntensity > 0 ? '#fff' : 'rgba(245, 158, 11, 0.4)',
-                    boxShadow: flickerIntensity > 0 ? '0 0 15px #ffedd5' : 'none'
-                  }}
-                />
-              </div>
+          {/* Top Letterbox Label */}
+          <div className="w-full flex justify-between items-center text-[11px] font-mono tracking-widest text-stone-500 uppercase">
+            <span>Portfolio Initialization</span>
+            <span>AWS Amplify // CloudFront Global CDN</span>
+          </div>
+
+          {/* Central Title Reveal */}
+          <div className="text-center space-y-4 max-w-lg">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest bg-amber-500/10 border border-amber-500/30 text-amber-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+              TKM College of Engineering • CS Undergrad
             </div>
 
-            {/* Cinematic Call to Action */}
-            <div className="mt-8 text-center space-y-2">
-              <button
-                onClick={triggerLampStrike}
-                className="px-6 py-3 rounded-full font-mono text-xs font-bold uppercase tracking-widest bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/30 transition-all flex items-center gap-2 group-hover:scale-105"
-              >
-                <Zap className="w-4 h-4 animate-bounce" />
-                <span>Strike Lamp • Power On</span>
-              </button>
-              <p className="text-[11px] text-stone-500 font-mono">
-                Click the filament bulb or button to initiate electrical ignition
-              </p>
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-none">
+              HARISANKAR S
+            </h1>
+
+            <p className="text-xs sm:text-sm text-stone-400 font-mono tracking-wide">
+              Deep Learning Researcher • Vision Transformers & Medical Imaging
+            </p>
+
+            {/* Glowing Cinematic Timeline Bar */}
+            <div className="pt-6 w-full max-w-xs mx-auto space-y-2">
+              <div className="w-full h-1 bg-stone-900 rounded-full overflow-hidden relative">
+                <div 
+                  className="h-full bg-gradient-to-r from-amber-500 to-amber-300 transition-all duration-75 shadow-lg shadow-amber-500/50"
+                  style={{ width: `${introProgress}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] font-mono text-stone-500">
+                <span>LOADING ASSETS</span>
+                <span className="text-amber-400 font-bold">{introProgress}%</span>
+              </div>
             </div>
+          </div>
+
+          {/* Bottom Skip Prompt */}
+          <div className="text-[10px] font-mono text-stone-600 hover:text-stone-400 transition-colors">
+            Click anywhere or press Enter to skip intro
           </div>
         </div>
       )}
 
       {/* =========================================================================
-          STICKY HEADER
+          STICKY NAVIGATION BAR
       ========================================================================= */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-black/80 border-b border-stone-800/80 transition-colors">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#09090b]/80 border-b border-stone-800/80 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           
           <a href="#" className="flex items-center gap-3 group">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base transition-transform group-hover:scale-105 border ${accentBorder} bg-black text-white shadow-sm`}>
-              <Lightbulb className={`w-4 h-4 ${accentText}`} />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 text-black flex items-center justify-center font-bold text-sm shadow-md transition-transform group-hover:scale-105">
+              HS
             </div>
             <div>
               <span className="font-bold tracking-tight text-white group-hover:text-amber-400 transition-colors">
@@ -343,104 +286,84 @@ export default function App() {
             <a href="#about" className="hover:text-amber-400 transition-colors">About</a>
             <a href="#research" className="hover:text-amber-400 transition-colors">Research</a>
             <a href="#projects" className="hover:text-amber-400 transition-colors">Projects</a>
-            <a href="#simulator" className={`hover:text-amber-400 transition-colors font-semibold ${accentText}`}>
-              Live Lab
+            <a href="#simulator" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Interactive Lab
             </a>
-            <a href="#skills" className="hover:text-amber-400 transition-colors">Superpowers</a>
+            <a href="#skills" className="hover:text-amber-400 transition-colors">Skills</a>
           </nav>
 
-          {/* Controls: Lamp Switch, Temp Toggle, Audio */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            
-            {/* Lamp Power Switch */}
-            <button
-              onClick={toggleLamp}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-bold border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition-all shadow-sm"
-              title="Click to toggle illumination"
+          <div className="flex items-center gap-3">
+            <a
+              href="https://github.com/harisankar-s-cs"
+              target="_blank"
+              rel="noreferrer"
+              className="p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-900 transition-colors"
+              title="GitHub Profile"
             >
-              <Lightbulb className="w-3.5 h-3.5" />
-              <span>{introState === 'illuminated' ? 'Lamp: ON' : 'Ignite'}</span>
-            </button>
-
-            {/* Color Temperature Switch (2700K vs 6500K) */}
-            <button
-              onClick={toggleTemperature}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-800 bg-stone-900/80 text-xs font-mono text-stone-300 hover:text-white transition-colors"
-              title="Toggle Tungsten 2700K / Cyan Arc 6500K"
+              <Github className="w-4 h-4" />
+            </a>
+            <a
+              href="https://linkedin.com/in/harisankar-s-0741b22a4"
+              target="_blank"
+              rel="noreferrer"
+              className="p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-900 transition-colors"
+              title="LinkedIn Profile"
             >
-              {lampTemperature === 'warm' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-cyan-400" />}
-              <span>{lampTemperature === 'warm' ? '2700K' : '6500K'}</span>
-            </button>
-
-            {/* Audio Toggle */}
+              <Linkedin className="w-4 h-4" />
+            </a>
             <button
-              onClick={() => {
-                setSoundEnabled(!soundEnabled)
-                playElectricSound('switch', !soundEnabled)
-              }}
-              className={`p-2 rounded-lg border transition-colors ${
-                soundEnabled 
-                  ? 'text-amber-400 border-amber-500/30 bg-amber-950/20' 
-                  : 'text-stone-600 border-stone-800 bg-stone-900'
-              }`}
-              title={soundEnabled ? 'Synthesizer Audio Enabled' : 'Audio Muted'}
+              onClick={() => setShowArchModal(true)}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-medium border border-stone-800 bg-stone-900/80 text-stone-300 hover:text-white hover:border-amber-500/40 transition-colors"
             >
-              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              <Cloud className="w-3.5 h-3.5 text-amber-400" />
+              <span>AWS Specs</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Prominent Visible Hint Banner (Required by Rubric) */}
-      <div className="py-2.5 px-4 text-center text-xs border-b bg-gradient-to-r from-amber-950/40 via-black to-stone-900/40 border-amber-900/30 text-amber-200/90 relative z-10">
+      {/* Prominent Visible Hint Banner (Required by Hackathon Rubric) */}
+      <div className="py-2.5 px-4 text-center text-xs border-b bg-gradient-to-r from-amber-950/30 via-[#09090b] to-stone-900/30 border-stone-800/80 text-stone-300 relative z-10">
         <span className="inline-flex items-center gap-2 font-medium">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
-          <strong>Interactive Feature Hint:</strong> Click the
-          <button 
-            onClick={toggleLamp}
-            className="underline font-bold text-amber-300 hover:text-white px-1 cursor-pointer"
-          >
-            Hanging Edison Bulb
-          </button>
-          or color temperature switch to control the cinematic illumination, or run the
-          <a href="#simulator" className="underline font-bold text-cyan-300 hover:text-white ml-1">
-            Restormer Denoising Lab
-          </a> below!
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <strong>Interactive Feature Hint:</strong> Test the working
+          <a href="#simulator" className="underline font-bold text-amber-400 hover:text-white px-1">
+            NIT Calicut Restormer Denoising Simulator
+          </a>
+          below to manipulate ultrasound noise reduction live on canvas!
         </span>
       </div>
 
       {/* =========================================================================
-          MAIN PORTFOLIO CONTENTS
+          MAIN PAGE BODY
       ========================================================================= */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-24 relative z-10">
 
-        {/* Hero Section with Spotlight and Photo Reveal */}
-        <section className="pt-4 sm:pt-8 grid md:grid-cols-12 gap-8 items-center relative">
+        {/* Hero Section: Photo + Story Header */}
+        <section className="pt-4 sm:pt-10 grid md:grid-cols-12 gap-8 items-center">
           
-          {/* Left Text */}
           <div className="md:col-span-8 space-y-6 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold border bg-stone-900/80 border-stone-700 text-stone-300">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold border bg-stone-900/80 border-stone-800 text-stone-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
               Final Year B.Tech CSE • TKM College of Engineering, Kollam
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              Hi, I'm <span className="bg-gradient-to-r from-amber-400 via-orange-300 to-yellow-500 bg-clip-text text-transparent">Harisankar S</span>
+              Hi, I'm <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-yellow-500 bg-clip-text text-transparent">Harisankar S</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-stone-300 max-w-2xl leading-relaxed">
-              Deep Learning Researcher specializing in 
-              <span className={`font-semibold ${accentText}`}> Vision Transformers</span>, 
-              <span className="text-amber-200 font-semibold"> Ultrasound Image Restoration</span>, and 
-              <span className="text-stone-100 font-semibold"> Geospatial Satellite Vision</span>. 
-              National 2nd Runner-Up in Mental Arithmetic & Chairperson of ACM Student Chapter at TKMCE.
+              Computer Science undergraduate and Deep Learning researcher specializing in 
+              <span className="text-amber-400 font-semibold"> Vision Transformers</span>, 
+              <span className="text-stone-100 font-semibold"> Medical Ultrasound Restoration</span>, and 
+              <span className="text-amber-300 font-semibold"> Geospatial Satellite Vision</span>. 
+              Chairperson of the ACM Student Chapter at TKMCE.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2 justify-center md:justify-start">
               <a
                 href="#research"
                 className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2"
-                onClick={() => playElectricSound('switch', soundEnabled)}
               >
                 <span>View Research & Benchmarks</span>
                 <ChevronRight className="w-4 h-4" />
@@ -448,87 +371,83 @@ export default function App() {
 
               <a
                 href="#simulator"
-                className="px-6 py-3 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-semibold transition-all flex items-center gap-2"
+                className="px-6 py-3 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-200 font-semibold transition-all flex items-center gap-2"
               >
-                <Zap className="w-4 h-4 text-amber-400" />
+                <Sparkles className="w-4 h-4 text-amber-400" />
                 <span>Launch Interactive Lab</span>
               </a>
             </div>
 
-            {/* Research Metrics Strip */}
+            {/* Core Metrics Strip */}
             <div className="grid grid-cols-3 gap-3 pt-4">
-              <div className="p-3.5 rounded-xl bg-stone-900/80 border border-stone-800">
+              <div className="p-3.5 rounded-xl bg-stone-900/60 border border-stone-800/80">
                 <div className="text-2xl font-black text-amber-400 font-mono">8.90</div>
                 <div className="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">TKMCE CGPA</div>
               </div>
-              <div className="p-3.5 rounded-xl bg-stone-900/80 border border-stone-800">
-                <div className="text-2xl font-black text-amber-300 font-mono">37.39 dB</div>
+              <div className="p-3.5 rounded-xl bg-stone-900/60 border border-stone-800/80">
+                <div className="text-2xl font-black text-white font-mono">37.39 dB</div>
                 <div className="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">NIT Restormer PSNR</div>
               </div>
-              <div className="p-3.5 rounded-xl bg-stone-900/80 border border-stone-800">
-                <div className="text-2xl font-black text-yellow-500 font-mono">National 2nd</div>
-                <div className="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">Mental Arithmetic</div>
+              <div className="p-3.5 rounded-xl bg-stone-900/60 border border-stone-800/80">
+                <div className="text-2xl font-black text-amber-300 font-mono">96.9%</div>
+                <div className="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">KSREC Pixel Accuracy</div>
               </div>
             </div>
           </div>
 
-          {/* Right Spotlight Portrait Card (Revealed under the lamp) */}
+          {/* Right Portrait Card with Real Personal Photo */}
           <div className="md:col-span-4 flex justify-center">
-            <div className="w-full max-w-sm p-6 rounded-2xl bg-stone-950/90 border-2 border-amber-500/40 shadow-2xl relative transition-all duration-500 hover:border-amber-400">
+            <div className="w-full max-w-sm p-6 rounded-2xl bg-stone-950/80 border border-stone-800 shadow-2xl relative">
               
-              {/* Profile Image with Golden Studio Rim Highlight */}
-              <div className="relative mb-5 mx-auto w-36 h-36 rounded-2xl overflow-hidden border-2 border-amber-400/80 shadow-2xl group">
+              {/* Harisankar's Personal Photo */}
+              <div className="relative mb-5 mx-auto w-40 h-40 rounded-2xl overflow-hidden border border-stone-700 shadow-xl group">
                 <img
                   src="/profile.jpg"
                   alt="Harisankar S"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                   onError={(e) => {
                     // Fallback to initials if image path fails
                     e.target.style.display = 'none'
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-2 left-2 text-[10px] font-mono font-bold text-amber-300 bg-black/80 px-2 py-0.5 rounded">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-2 left-2 text-[10px] font-mono font-bold text-amber-400 bg-black/80 px-2 py-0.5 rounded">
                   Harisankar S
                 </div>
               </div>
 
               <div className="space-y-3 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-stone-800">
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
                   <span className="text-stone-400">Department</span>
-                  <span className="font-bold text-white">Computer Science & Eng.</span>
+                  <span className="font-semibold text-white">Computer Science & Eng.</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-stone-800">
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
                   <span className="text-stone-400">Institution</span>
-                  <span className="font-bold text-white">TKM College of Eng.</span>
+                  <span className="font-semibold text-white">TKM College of Eng.</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-stone-800">
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
                   <span className="text-stone-400">Leadership</span>
-                  <span className="font-bold text-amber-400">Chairperson, ACM TKMCE</span>
+                  <span className="font-semibold text-amber-400">Chairperson, ACM TKMCE</span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="text-stone-400">Cloud Host</span>
-                  <span className="font-bold text-emerald-400 flex items-center gap-1">
+                  <span className="text-stone-400">Deployment</span>
+                  <span className="font-semibold text-emerald-400 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" /> AWS Amplify Hosted
                   </span>
                 </div>
-              </div>
-
-              <div className="mt-4 p-3 rounded-xl bg-amber-950/20 border border-amber-800/40 text-[11px] text-amber-200 leading-relaxed">
-                💡 <strong>The Analytical Instinct:</strong> Years of competitive mental arithmetic trained my intuition for multi-dimensional tensor matrix dimensions and algorithmic efficiency.
               </div>
             </div>
           </div>
         </section>
 
-        {/* 🌟 INTERACTIVE FEATURE: Restormer Ultrasound Denoising Lab */}
-        <section id="simulator" className="p-6 sm:p-10 rounded-3xl bg-stone-950/80 border border-amber-500/40 shadow-2xl relative overflow-hidden">
+        {/* 🌟 THE CREATIVE FEATURE: Interactive Restormer Ultrasound Denoising Lab */}
+        <section id="simulator" className="p-6 sm:p-10 rounded-3xl bg-stone-950/70 border border-amber-500/30 shadow-2xl relative overflow-hidden">
           <div className="grid lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '5s' }} />
-                Interactive Feature: NIT Calicut Restormer Simulator
+                <Sparkles className="w-3.5 h-3.5" />
+                Interactive Research Feature (Hackathon Rubric 30%)
               </div>
 
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -536,12 +455,12 @@ export default function App() {
               </h2>
 
               <p className="text-sm sm:text-base text-stone-300 leading-relaxed">
-                At <strong>NIT Calicut</strong>, I engineered a 26M-parameter Hybrid Restormer to eliminate speckle noise in musculoskeletal ultrasound without losing tissue boundaries. 
-                <strong> Adjust the sliders below to test how patch-size curriculum and denoising affect image fidelity:</strong>
+                During my research at <strong>NIT Calicut</strong>, I engineered a 26M-parameter Wavelet Dual-Stream Hybrid Restormer to eliminate speckle noise in musculoskeletal ultrasound without blurring diagnostic tissue margins. 
+                <strong> Adjust the parameters below to observe real-time spatial-frequency boundary retention:</strong>
               </p>
 
               {/* Slider: Noise Level */}
-              <div className="space-y-2 p-4 rounded-xl bg-stone-900/90 border border-stone-800">
+              <div className="space-y-2 p-4 rounded-xl bg-stone-900/80 border border-stone-800">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-stone-300">Input Speckle Noise Dissipation</span>
                   <span className="text-amber-400 font-mono font-bold">{100 - noiseLevel}% Denoised</span>
@@ -551,20 +470,17 @@ export default function App() {
                   min="5"
                   max="90"
                   value={noiseLevel}
-                  onChange={(e) => {
-                    setNoiseLevel(Number(e.target.value))
-                    playElectricSound('switch', soundEnabled)
-                  }}
+                  onChange={(e) => setNoiseLevel(Number(e.target.value))}
                   className="w-full h-2 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
                 />
                 <div className="flex justify-between text-[10px] text-stone-500 font-mono">
-                  <span>Raw Ultrasound (Heavy Speckle)</span>
+                  <span>Raw Ultrasound (High Speckle)</span>
                   <span>Restormer Filtered</span>
                 </div>
               </div>
 
-              {/* Buttons: Patch Curriculum */}
-              <div className="space-y-2 p-4 rounded-xl bg-stone-900/90 border border-stone-800">
+              {/* Progressive Patch-Size Curriculum */}
+              <div className="space-y-2 p-4 rounded-xl bg-stone-900/80 border border-stone-800">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-stone-300">Progressive Patch-Size Curriculum</span>
                   <span className="text-amber-300 font-mono font-bold">{patchSize} × {patchSize} px</span>
@@ -573,10 +489,7 @@ export default function App() {
                   {[128, 256, 384].map((size) => (
                     <button
                       key={size}
-                      onClick={() => {
-                        setPatchSize(size)
-                        playElectricSound('switch', soundEnabled)
-                      }}
+                      onClick={() => setPatchSize(size)}
                       className={`py-2 px-3 rounded-lg text-xs font-bold font-mono transition-all border ${
                         patchSize === size
                           ? 'bg-amber-500 text-black border-amber-400 shadow-md shadow-amber-500/20'
@@ -591,15 +504,15 @@ export default function App() {
 
               {/* Metrics Live */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-stone-900/80 rounded-xl border border-stone-800">
+                <div className="p-3 bg-stone-900/60 rounded-xl border border-stone-800">
                   <div className="text-[11px] text-stone-400 font-medium">Synthetic PSNR (Fidelity)</div>
                   <div className="text-xl font-bold font-mono text-amber-400">{calculatedPSNR} dB</div>
-                  <div className="text-[10px] text-stone-500">Benchmark: 37.39 dB</div>
+                  <div className="text-[10px] text-stone-500">Target Benchmark: 37.39 dB</div>
                 </div>
-                <div className="p-3 bg-stone-900/80 rounded-xl border border-stone-800">
+                <div className="p-3 bg-stone-900/60 rounded-xl border border-stone-800">
                   <div className="text-[11px] text-stone-400 font-medium">Structural SSIM</div>
                   <div className="text-xl font-bold font-mono text-emerald-400">{calculatedSSIM}</div>
-                  <div className="text-[10px] text-stone-500">Benchmark: 0.953</div>
+                  <div className="text-[10px] text-stone-500">Target Benchmark: 0.953</div>
                 </div>
               </div>
             </div>
@@ -608,17 +521,17 @@ export default function App() {
             <div className="lg:col-span-5 flex flex-col items-center justify-center space-y-3">
               <div className="relative p-2 rounded-2xl bg-black border border-stone-800 shadow-2xl">
                 <canvas
-                  ref={canvasRef}
+                  ref={labCanvasRef}
                   width={280}
                   height={280}
                   className="rounded-xl border border-stone-800 cursor-crosshair"
                 />
                 <div className="absolute bottom-4 left-4 bg-stone-900/90 backdrop-blur px-2.5 py-1 rounded-md text-[10px] font-mono text-amber-300 border border-amber-500/30">
-                  Interactive Wavelet Plane
+                  Wavelet Plane
                 </div>
               </div>
               <p className="text-[11px] text-stone-400 text-center max-w-xs font-mono">
-                HTML5 Canvas simulating high-frequency tissue boundary retention.
+                Live HTML5 Canvas simulating frequency boundary retention during transformer denoising.
               </p>
             </div>
 
@@ -629,42 +542,43 @@ export default function App() {
         <section id="about" className="space-y-6">
           <div className="flex items-center gap-3">
             <GraduationCap className="w-6 h-6 text-amber-400" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">About My Journey</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">About My Work</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-stone-900/60 border border-stone-800 space-y-4 text-stone-300 leading-relaxed text-sm sm:text-base">
+            <div className="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-stone-950/60 border border-stone-800/80 space-y-4 text-stone-300 leading-relaxed text-sm sm:text-base">
               <p>
                 I am a final-year Computer Science & Engineering undergraduate at <strong>TKM College of Engineering, Kollam</strong> (CGPA 8.90). 
-                My technical philosophy connects fundamental mathematical instincts with applied deep vision research.
+                My focus centers on deep learning architectures for computer vision—specifically resolving the trade-offs between 
+                computational throughput, edge retention, and noise dissipation.
               </p>
               <p>
-                My training began in school with competitive mental arithmetic, earning 
-                <span className="text-amber-400 font-semibold"> National 2nd Runner-Up</span> and 
-                <span className="text-yellow-300 font-semibold"> Kerala State 1st Runner-Up</span> in Abacus. 
-                That foundation gave me a distinct spatial intuition for multi-dimensional linear algebra and tensor shapes.
+                Through research fellowships at <strong>NIT Calicut</strong> and <strong>KSREC</strong>, I designed and trained specialized 
+                Vision Transformers. At NIT Calicut, I developed custom EdgeCNN and wavelet loss functions for medical ultrasound denoising 
+                on NVIDIA H200 GPU infrastructure. At KSREC, I built Siamese Swin Transformers to automate land-use change detection 
+                across Kerala from bi-temporal satellite imagery.
               </p>
               <p>
-                During research fellowships at <strong>NIT Calicut</strong> and <strong>KSREC</strong>, I engineered Vision Transformers 
-                for medical ultrasound restoration and satellite land-use change detection on high-throughput NVIDIA H200 GPU infrastructure. 
-                As <strong>Chairperson of the ACM Student Chapter at TKMCE</strong>, I lead technical workshops, hackathons, and research discussion groups.
+                In parallel with research, I serve as <strong>Chairperson of the ACM Student Chapter at TKMCE</strong>, directing technical 
+                workshops, hackathons, and research discussion groups for our student community.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-gradient-to-b from-amber-950/20 to-stone-900 border border-amber-800/40 flex flex-col justify-between">
+            {/* Foundations & Accolades */}
+            <div className="p-6 rounded-2xl bg-gradient-to-b from-stone-900/50 to-stone-950 border border-stone-800 flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4">
                   <Brain className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-white mb-2">The Dual Advantage</h3>
+                <h3 className="text-base font-bold text-white mb-2">Mathematical Rigor</h3>
                 <p className="text-xs text-stone-300 leading-relaxed">
-                  Deep learning isn't just about training loops; it's about algorithmic rigor. Combining mental calculation speed with 
-                  modern Vision Transformers allows me to spot tensor bottlenecks and loss divergence quickly.
+                  Secured <strong>National 2nd Runner-Up</strong> and <strong>Kerala State 1st Runner-Up</strong> in competitive mental arithmetic (Abacus). 
+                  This foundation developed early discipline in numerical computation and spatial matrix operations.
                 </p>
               </div>
 
               <div className="pt-4 border-t border-stone-800 mt-4 text-xs font-semibold text-amber-400 flex items-center gap-1.5">
-                <Award className="w-4 h-4" /> National Abacus Laureate
+                <Award className="w-4 h-4" /> National & State Math Accolade
               </div>
             </div>
           </div>
@@ -679,14 +593,14 @@ export default function App() {
 
           <div className="space-y-6">
             
-            {/* NIT Calicut */}
-            <div className="p-6 sm:p-8 rounded-2xl bg-stone-900/60 border border-stone-800 hover:border-stone-700 transition-all">
+            {/* NIT Calicut Card */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-stone-950/60 border border-stone-800 hover:border-stone-700 transition-all">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <div>
                   <h3 className="text-xl font-bold text-white">National Institute of Technology Calicut (NIT Calicut)</h3>
                   <p className="text-sm text-amber-400 font-medium">Deep Learning Research Intern • Dept. of Computer Science & Engineering</p>
                 </div>
-                <span className="text-xs text-stone-400 bg-stone-800/80 px-3 py-1 rounded-full w-fit">
+                <span className="text-xs text-stone-400 bg-stone-900 px-3 py-1 rounded-full w-fit border border-stone-800">
                   May 2026 – Jul 2026 • Calicut, Kerala
                 </span>
               </div>
@@ -704,14 +618,14 @@ export default function App() {
               </ul>
             </div>
 
-            {/* KSREC */}
-            <div className="p-6 sm:p-8 rounded-2xl bg-stone-900/60 border border-stone-800 hover:border-stone-700 transition-all">
+            {/* KSREC Card */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-stone-950/60 border border-stone-800 hover:border-stone-700 transition-all">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <div>
                   <h3 className="text-xl font-bold text-white">Kerala State Remote Sensing and Environment Centre (KSREC)</h3>
-                  <p className="text-sm text-yellow-500 font-medium">Deep Learning / Computer Vision Intern</p>
+                  <p className="text-sm text-amber-300 font-medium">Deep Learning / Computer Vision Intern</p>
                 </div>
-                <span className="text-xs text-stone-400 bg-stone-800/80 px-3 py-1 rounded-full w-fit">
+                <span className="text-xs text-stone-400 bg-stone-900 px-3 py-1 rounded-full w-fit border border-stone-800">
                   Jun 2025 – Jul 2025 • Thiruvananthapuram, Kerala
                 </span>
               </div>
@@ -741,10 +655,10 @@ export default function App() {
 
           <div className="grid md:grid-cols-2 gap-6">
             
-            <div className="p-6 rounded-2xl bg-stone-900/60 border border-stone-800 flex flex-col justify-between">
+            <div className="p-6 rounded-2xl bg-stone-950/60 border border-stone-800 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-mono text-amber-400 bg-amber-950/80 px-2.5 py-1 rounded-full border border-amber-800/50">
+                  <span className="text-xs font-mono text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded-full border border-amber-800/50">
                     Satellite Computer Vision
                   </span>
                   <a href="https://github.com/harisankar-s-cs" target="_blank" rel="noreferrer" className="text-stone-400 hover:text-white">
@@ -760,7 +674,7 @@ export default function App() {
 
                 <div className="flex flex-wrap gap-2">
                   {['Python', 'PyTorch', 'Swin Transformer', 'LEVIR-CD', 'OpenCV'].map((tech) => (
-                    <span key={tech} className="text-xs px-2 py-0.5 rounded bg-stone-800 text-stone-300 font-mono">
+                    <span key={tech} className="text-xs px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300 font-mono">
                       {tech}
                     </span>
                   ))}
@@ -768,10 +682,10 @@ export default function App() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-stone-900/60 border border-stone-800 flex flex-col justify-between">
+            <div className="p-6 rounded-2xl bg-stone-950/60 border border-stone-800 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-mono text-yellow-400 bg-yellow-950/80 px-2.5 py-1 rounded-full border border-yellow-800/50">
+                  <span className="text-xs font-mono text-amber-300 bg-stone-900 px-2.5 py-1 rounded-full border border-stone-800">
                     Desktop Application
                   </span>
                   <a href="https://github.com/harisankar-s-cs" target="_blank" rel="noreferrer" className="text-stone-400 hover:text-white">
@@ -787,7 +701,7 @@ export default function App() {
 
                 <div className="flex flex-wrap gap-2">
                   {['Java', 'JavaFX', 'OOP Architecture', 'State Logic', 'Authentication'].map((tech) => (
-                    <span key={tech} className="text-xs px-2 py-0.5 rounded bg-stone-800 text-stone-300 font-mono">
+                    <span key={tech} className="text-xs px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300 font-mono">
                       {tech}
                     </span>
                   ))}
@@ -798,60 +712,60 @@ export default function App() {
           </div>
         </section>
 
-        {/* Core Section 4: Skills & Tech Superpowers */}
+        {/* Core Section 4: Skills & Tech Competencies */}
         <section id="skills" className="space-y-6">
           <div className="flex items-center gap-3">
             <Cpu className="w-6 h-6 text-amber-400" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Skills & Tech Superpowers</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Technical Skills</h2>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-5 rounded-2xl bg-stone-900/60 border border-stone-800">
+            <div className="p-5 rounded-2xl bg-stone-950/60 border border-stone-800">
               <h3 className="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
                 <Code2 className="w-4 h-4" /> Languages
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {['Python', 'Java', 'C', 'JavaScript', 'HTML5', 'CSS3'].map((item) => (
-                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-800 text-stone-200 font-mono">
+                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-900 border border-stone-800/80 text-stone-200 font-mono">
                     {item}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-stone-900/60 border border-stone-800">
+            <div className="p-5 rounded-2xl bg-stone-950/60 border border-stone-800">
               <h3 className="text-sm font-bold text-amber-300 mb-3 flex items-center gap-2">
                 <Brain className="w-4 h-4" /> ML & Vision
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {['PyTorch', 'Vision Transformers', 'Restormer', 'Swin', 'CNNs', 'Wavelets', 'Segmentation'].map((item) => (
-                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-800 text-stone-200 font-mono">
+                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-900 border border-stone-800/80 text-stone-200 font-mono">
                     {item}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-stone-900/60 border border-stone-800">
+            <div className="p-5 rounded-2xl bg-stone-950/60 border border-stone-800">
               <h3 className="text-sm font-bold text-yellow-400 mb-3 flex items-center gap-2">
                 <Layers className="w-4 h-4" /> Tools & Libraries
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {['NumPy', 'OpenCV', 'Albumentations', 'BasicSR', 'JavaFX', 'Git', 'Linux'].map((item) => (
-                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-800 text-stone-200 font-mono">
+                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-900 border border-stone-800/80 text-stone-200 font-mono">
                     {item}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-stone-900/60 border border-stone-800">
+            <div className="p-5 rounded-2xl bg-stone-950/60 border border-stone-800">
               <h3 className="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
                 <Cloud className="w-4 h-4" /> Cloud & Core CS
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {['AWS Amplify', 'CloudFront', 'Data Structures', 'Algorithms', 'OS', 'DBMS', 'Networks'].map((item) => (
-                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-800 text-stone-200 font-mono">
+                  <span key={item} className="text-xs px-2.5 py-1 rounded-md bg-stone-900 border border-stone-800/80 text-stone-200 font-mono">
                     {item}
                   </span>
                 ))}
@@ -869,15 +783,12 @@ export default function App() {
             </div>
             <h3 className="text-xl font-bold text-white">Live AWS Architecture & Deployment</h3>
             <p className="text-sm text-stone-400 max-w-xl">
-              Connected directly to GitHub with automated CI/CD builds on AWS Amplify Hosting, distributed via Amazon CloudFront global edge caches.
+              Automated continuous deployment from GitHub to AWS Amplify Hosting, distributed via Amazon CloudFront global edge caches.
             </p>
           </div>
 
           <button
-            onClick={() => {
-              setShowArchModal(true)
-              playElectricSound('switch', soundEnabled)
-            }}
+            onClick={() => setShowArchModal(true)}
             className="px-5 py-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-sm transition-all border border-stone-700 flex items-center gap-2 whitespace-nowrap cursor-pointer"
           >
             <Cloud className="w-4 h-4 text-amber-400" />
