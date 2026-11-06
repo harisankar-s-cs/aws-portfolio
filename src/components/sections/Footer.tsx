@@ -30,17 +30,10 @@ export function Footer({
       {/* Center / Right: Accessibility & Controls */}
       <div className="flex items-center gap-6">
         <button
-          onClick={onToggleReducedEffects}
-          className="hover:text-bone transition-colors underline cursor-pointer"
-        >
-          {reducedEffects ? 'Restore Effects' : 'Reduce Effects'}
-        </button>
-
-        <button
           onClick={onReplayIntro}
-          className="hover:text-bone transition-colors underline cursor-pointer"
+          className="hover:text-amber-lamp text-muted transition-colors underline cursor-pointer"
         >
-          Replay Cinematic Intro
+          Replay Lamp Intro
         </button>
 
         <span className="text-muted/60">

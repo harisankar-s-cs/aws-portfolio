@@ -16,34 +16,25 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
   const captionIndexRef = useRef<number>(0)
   const gpuTier = useGpuTier()
 
-  // Face hover interaction: after 350ms hovering portrait, show mono caption (1.5s cooldown)
+  // Face hover interaction: prompt reveal on hover (200ms) with clean dismiss
   const triggerFaceCaption = () => {
-    const now = Date.now()
-    if (now - lastCaptionTimeRef.current < 1500) {
-      return
-    }
-
     const line = dialogues.portraitHoverLines[captionIndexRef.current % dialogues.portraitHoverLines.length]
     captionIndexRef.current++
-    lastCaptionTimeRef.current = Date.now()
     setFaceCaption(line)
-
-    setTimeout(() => {
-      setFaceCaption(null)
-    }, 3200)
   }
 
   const handleMouseEnterPortrait = () => {
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
     hoverTimerRef.current = setTimeout(() => {
       triggerFaceCaption()
-    }, 350)
+    }, 200)
   }
 
   const handleMouseLeavePortrait = () => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
-    }
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+    setTimeout(() => {
+      setFaceCaption(null)
+    }, 1400)
   }
 
   return (
@@ -69,7 +60,8 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
           <div
             onMouseEnter={handleMouseEnterPortrait}
             onMouseLeave={handleMouseLeavePortrait}
-            onTouchStart={handleMouseEnterPortrait}
+            onTouchStart={triggerFaceCaption}
+            onClick={triggerFaceCaption}
             className="relative w-full max-w-md aspect-[4/5] rounded-lg overflow-hidden border border-hairlineLight bg-[#141210] shadow-2xl cursor-pointer"
             data-cursor="HARISANKAR"
           >

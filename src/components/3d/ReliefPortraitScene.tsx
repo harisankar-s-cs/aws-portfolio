@@ -11,7 +11,6 @@ interface ReliefPortraitMeshProps {
 function ReliefPortraitMesh({ onFaceHover }: ReliefPortraitMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const spotLightRef = useRef<THREE.SpotLight>(null)
-  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load color map and subtle depth displacement map
   const [colorMap, depthMap] = useTexture([
@@ -31,7 +30,7 @@ function ReliefPortraitMesh({ onFaceHover }: ReliefPortraitMeshProps) {
     const { pointer, camera } = state
 
     if (spotLightRef.current) {
-      const targetX = pointer.x * 0.4
+      const targetX = pointer.x * 0.45
       const targetY = 1.6 + pointer.y * 0.2
       spotLightRef.current.position.x = THREE.MathUtils.damp(
         spotLightRef.current.position.x,
@@ -52,18 +51,6 @@ function ReliefPortraitMesh({ onFaceHover }: ReliefPortraitMeshProps) {
     camera.position.y = THREE.MathUtils.damp(camera.position.y, pointer.y * 0.08, 2.5, delta)
     camera.lookAt(0, 0, 0)
   })
-
-  const handlePointerOver = () => {
-    hoverTimerRef.current = setTimeout(() => {
-      onFaceHover?.()
-    }, 600)
-  }
-
-  const handlePointerOut = () => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
-    }
-  }
 
   return (
     <group>
@@ -90,14 +77,12 @@ function ReliefPortraitMesh({ onFaceHover }: ReliefPortraitMeshProps) {
       <mesh
         ref={meshRef}
         position={[0, 0, 0]}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}
       >
         <planeGeometry args={[1.75, 1.8, 128, 128]} />
         <meshStandardMaterial
           map={colorMap}
           displacementMap={depthMap}
-          displacementScale={0.025} // Very subtle displacement to keep the face 100% natural, crisp and bright
+          displacementScale={0.025}
           roughness={0.4}
           metalness={0.02}
         />
@@ -136,7 +121,7 @@ export function ReliefPortraitScene({ onFaceHover, className = '' }: ReliefPortr
   }, [])
 
   return (
-    <div ref={containerRef} className={`relative w-full h-full ${className}`}>
+    <div ref={containerRef} className={`relative w-full h-full pointer-events-none ${className}`}>
       <Canvas
         frameloop={isVisible ? 'always' : 'never'}
         dpr={[1, 2]}
