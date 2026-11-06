@@ -47,48 +47,52 @@ export function Home({
       />
 
       {/* Editorial Navigation Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-background/85 border-b border-hairline">
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 h-16 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2.5 group">
-            <span className="font-mono text-xs font-bold text-amber-lamp">// HS</span>
-            <span className="font-display text-lg text-bone tracking-tight group-hover:text-amber-lamp transition-colors">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-background/90 border-b border-hairline">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-20 flex items-center justify-between gap-4">
+          
+          {/* Brand Logo */}
+          <a href="#" className="flex items-center gap-2.5 shrink-0 whitespace-nowrap group">
+            <span className="font-mono text-sm sm:text-base font-bold text-amber-lamp">// HS</span>
+            <span className="font-display text-lg sm:text-2xl text-bone tracking-tight group-hover:text-amber-lamp transition-colors">
               Harisankar S.
             </span>
           </a>
 
-          <nav className="hidden md:flex items-center gap-7 font-mono text-xs text-muted">
-            <a href="#prologue" className="hover:text-bone transition-colors">Prologue</a>
-            <a href="#work" className="hover:text-bone transition-colors">Selected Work</a>
-            <a href="#toolkit" className="hover:text-bone transition-colors">Toolkit</a>
-            <a href="#journey" className="hover:text-bone transition-colors">Journey</a>
-            <a href="#under-the-hood" className="hover:text-bone transition-colors flex items-center gap-1.5 text-bone">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp" />
+          {/* Desktop Navigation Links */}
+          <nav className="hidden xl:flex items-center gap-6 2xl:gap-8 font-mono text-sm text-muted shrink-0">
+            <a href="#prologue" className="hover:text-bone transition-colors whitespace-nowrap">Prologue</a>
+            <a href="#work" className="hover:text-bone transition-colors whitespace-nowrap">Selected Work</a>
+            <a href="#toolkit" className="hover:text-bone transition-colors whitespace-nowrap">Toolkit</a>
+            <a href="#journey" className="hover:text-bone transition-colors whitespace-nowrap">Journey</a>
+            <a href="#under-the-hood" className="hover:text-bone transition-colors whitespace-nowrap flex items-center gap-2 text-bone font-medium">
+              <span className="h-2 w-2 rounded-full bg-amber-lamp animate-pulse" />
               <span>Under the hood</span>
             </a>
-            <a href="#contact" className="hover:text-bone transition-colors">Contact</a>
+            <a href="#contact" className="hover:text-bone transition-colors whitespace-nowrap">Contact</a>
           </nav>
 
-          <div className="flex items-center gap-3 text-xs font-mono">
+          {/* Right Action Controls */}
+          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0 font-mono">
             {/* Interactive CLI Terminal Pill Button */}
             <button
               onClick={() => setIsTerminalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#171513] border border-amber-lamp/50 text-[11px] text-amber-lamp hover:bg-amber-lamp/15 transition-all cursor-pointer font-bold shadow-sm"
+              className="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg bg-[#171513] border border-amber-lamp/60 text-xs sm:text-sm text-amber-lamp hover:bg-amber-lamp/15 transition-all cursor-pointer font-bold shadow-sm whitespace-nowrap"
               title="Open interactive AWS CLI Terminal (Hotkey: ~)"
               data-cursor="CLI"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp animate-pulse" />
+              <span className="h-2 w-2 rounded-full bg-amber-lamp animate-pulse" />
               <span>&gt;_ CLI</span>
             </button>
 
             {/* Built on AWS chip */}
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#171513] border border-hairlineLight text-[11px] text-muted">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#171513] border border-hairlineLight text-xs text-muted font-medium whitespace-nowrap">
               <span className="text-[#FF9900] font-bold">AWS</span>
               <span>Amplify Gen 2</span>
             </div>
 
             <button
               onClick={onReplayIntro}
-              className="hidden sm:block px-3 py-1 rounded border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer text-[11px]"
+              className="hidden md:block px-3 py-1.5 rounded-lg border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer text-xs whitespace-nowrap"
               title="Replay cinematic lamp sequence"
             >
               Replay Lamp

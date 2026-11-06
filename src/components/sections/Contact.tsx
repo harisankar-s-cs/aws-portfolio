@@ -28,66 +28,67 @@ export function Contact({ onTriggerDialogue }: ContactProps) {
   }
 
   return (
-    <section id="contact" className="py-24 px-6 sm:px-12 max-w-7xl mx-auto space-y-16">
+    <section id="contact" className="py-32 sm:py-44 px-6 sm:px-12 max-w-7xl mx-auto space-y-20">
       
       {/* Section Header */}
       <div 
         onMouseEnter={handleMouseEnterContact}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-b pb-6"
+        className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 hairline-b pb-8"
       >
-        <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-amber-lamp">
-            // INITIATE DIALOGUE
+        <div className="space-y-4">
+          <span className="font-mono text-base uppercase tracking-widest text-amber-lamp font-bold flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-lamp" />
+            <span>// INITIATE DIALOGUE & TRANSMISSION</span>
           </span>
-          <h2 className="font-display text-4xl sm:text-6xl text-bone tracking-tight font-normal mt-2">
+          <h2 className="font-display text-6xl sm:text-8xl text-bone tracking-tight font-normal">
             Direct Transmission.
           </h2>
         </div>
-        <p className="font-mono text-xs text-muted max-w-xs sm:text-right">
+        <p className="font-mono text-sm sm:text-base text-muted max-w-sm sm:text-right leading-relaxed">
           Open to research collaborations, cloud engineering roles, and deep learning fellowships.
         </p>
       </div>
 
       {/* Huge Click-to-Copy Email Anchor */}
       <div className="space-y-4">
-        <span className="font-mono text-xs text-muted uppercase tracking-wider block">
-          Primary Channel (Click to Copy)
+        <span className="font-mono text-sm text-muted uppercase tracking-wider block font-bold">
+          Primary Secure Channel (Click to Copy)
         </span>
         
         <button
           onClick={handleCopyEmail}
-          className="text-left font-display text-3xl sm:text-5xl lg:text-7xl text-bone hover:text-amber-lamp transition-colors duration-300 font-normal tracking-tight break-all cursor-pointer group"
+          className="text-left font-display text-4xl sm:text-6xl lg:text-8xl text-bone hover:text-amber-lamp transition-colors duration-300 font-normal tracking-tight break-all cursor-pointer group"
           data-cursor="COPY"
         >
           {personal.email}
-          <span className="inline-block ml-3 font-mono text-xs text-amber-lamp group-hover:translate-x-2 transition-transform duration-300">
+          <span className="inline-block ml-4 font-mono text-sm text-amber-lamp group-hover:translate-x-3 transition-transform duration-300">
             {copied ? '✓ COPIED TO CLIPBOARD' : '↗'}
           </span>
         </button>
       </div>
 
       {/* Contact Form & Socials Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pt-8 hairline-t">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 pt-10 hairline-t">
         
         {/* Left: Contact Form (7 cols) */}
-        <div className="md:col-span-7 space-y-6">
-          <h3 className="font-display text-2xl text-bone font-normal">
+        <div className="md:col-span-7 space-y-8">
+          <h3 className="font-display text-3xl sm:text-4xl text-bone font-normal">
             Transmit a Message
           </h3>
 
-          <form onSubmit={handleSubmitForm} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmitForm} className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <input
                 type="text"
                 required
                 placeholder="Your Name"
-                className="w-full bg-[#12100E] border border-hairlineLight rounded-lg px-4 py-3 font-mono text-xs text-bone placeholder:text-muted focus:outline-none focus:border-amber-lamp transition-colors"
+                className="w-full bg-[#12100E] border border-hairlineLight rounded-xl px-5 py-4 font-mono text-sm sm:text-base text-bone placeholder:text-muted focus:outline-none focus:border-amber-lamp transition-colors"
               />
               <input
                 type="email"
                 required
                 placeholder="Your Email"
-                className="w-full bg-[#12100E] border border-hairlineLight rounded-lg px-4 py-3 font-mono text-xs text-bone placeholder:text-muted focus:outline-none focus:border-amber-lamp transition-colors"
+                className="w-full bg-[#12100E] border border-hairlineLight rounded-xl px-5 py-4 font-mono text-sm sm:text-base text-bone placeholder:text-muted focus:outline-none focus:border-amber-lamp transition-colors"
               />
             </div>
 
@@ -95,51 +96,51 @@ export function Contact({ onTriggerDialogue }: ContactProps) {
               required
               rows={4}
               placeholder="Your Transmission / Inquiry"
-              className="w-full bg-[#12100E] border border-hairlineLight rounded-lg px-4 py-3 font-mono text-xs text-bone placeholder:text-muted focus:outline-none focus:border-amber-lamp transition-colors resize-none"
+              className="w-full bg-[#12100E] border border-hairlineLight rounded-xl px-5 py-4 font-mono text-sm sm:text-base text-bone placeholder:text-muted focus:outline-none focus:border-amber-lamp transition-colors resize-none"
             />
 
             <button
               type="submit"
-              className="px-6 py-3 rounded-full bg-amber-lamp text-background font-mono text-xs font-bold uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-lamp/20"
+              className="px-8 py-4 rounded-full bg-amber-lamp text-background font-mono text-sm sm:text-base font-bold uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-lamp/20"
             >
-              {formSubmitted ? '✓ Message Transmitted' : 'Send Message'}
+              {formSubmitted ? '✓ Message Transmitted via SNS' : 'Send Message ↗'}
             </button>
           </form>
         </div>
 
         {/* Right: Direct Coordinates & Socials (5 cols) */}
-        <div className="md:col-span-5 space-y-6 font-mono text-xs text-muted">
-          <h3 className="font-display text-2xl text-bone font-normal font-sans">
+        <div className="md:col-span-5 space-y-8 font-mono text-sm sm:text-base text-muted">
+          <h3 className="font-display text-3xl sm:text-4xl text-bone font-normal font-sans">
             Direct Coordinates
           </h3>
 
-          <div className="space-y-4 divide-y divide-hairline">
-            <div className="pt-3 flex justify-between">
+          <div className="space-y-5 divide-y divide-hairline">
+            <div className="pt-4 flex justify-between items-center">
               <span>Location</span>
-              <span className="text-bone">{personal.location}</span>
+              <span className="text-bone font-medium">{personal.location}</span>
             </div>
-            <div className="pt-3 flex justify-between">
+            <div className="pt-4 flex justify-between items-center">
               <span>Telephone</span>
-              <span className="text-bone">{personal.phone}</span>
+              <span className="text-bone font-medium">{personal.phone}</span>
             </div>
-            <div className="pt-3 flex justify-between">
+            <div className="pt-4 flex justify-between items-center">
               <span>GitHub</span>
               <a 
                 href={personal.github} 
                 target="_blank" 
                 rel="noreferrer"
-                className="text-bone hover:text-amber-lamp transition-colors"
+                className="text-bone hover:text-amber-lamp transition-colors underline font-medium"
               >
                 github.com/harisankar-s-cs ↗
               </a>
             </div>
-            <div className="pt-3 flex justify-between">
+            <div className="pt-4 flex justify-between items-center">
               <span>LinkedIn</span>
               <a 
                 href={personal.linkedin} 
                 target="_blank" 
                 rel="noreferrer"
-                className="text-bone hover:text-amber-lamp transition-colors"
+                className="text-bone hover:text-amber-lamp transition-colors underline font-medium"
               >
                 in/harisankar-s-0741b22a4 ↗
               </a>

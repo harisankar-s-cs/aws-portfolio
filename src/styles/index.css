@@ -15,9 +15,28 @@
     background-color: #0B0A09;
     color: #EDE6DA;
     font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 17.5px;
     scroll-behavior: auto; /* Let Lenis handle smooth scrolling */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (min-width: 640px) {
+    html {
+      font-size: 18px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    html {
+      font-size: 19px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    html {
+      font-size: 19.5px;
+    }
   }
 
   /* Lenis smooth scrolling rules */
