@@ -16,10 +16,10 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
   const captionIndexRef = useRef<number>(0)
   const gpuTier = useGpuTier()
 
-  // Face hover interaction: after 600ms hovering portrait, show mono caption (8s cooldown)
+  // Face hover interaction: after 350ms hovering portrait, show mono caption (1.5s cooldown)
   const triggerFaceCaption = () => {
     const now = Date.now()
-    if (now - lastCaptionTimeRef.current < 8000) {
+    if (now - lastCaptionTimeRef.current < 1500) {
       return
     }
 
@@ -30,13 +30,14 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
 
     setTimeout(() => {
       setFaceCaption(null)
-    }, 2800)
+    }, 3200)
   }
 
   const handleMouseEnterPortrait = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
     hoverTimerRef.current = setTimeout(() => {
       triggerFaceCaption()
-    }, 600)
+    }, 350)
   }
 
   const handleMouseLeavePortrait = () => {
@@ -91,11 +92,12 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
             </div>
           </div>
 
-          {/* Interactive Face Hover Caption Toast */}
+          {/* Interactive Face Hover Caption Toast (Timely, High-legibility) */}
           {faceCaption && (
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="px-3.5 py-1.5 rounded-full bg-[#1A1815] border border-amber-lamp/50 font-mono text-xs text-bone shadow-2xl">
-                {faceCaption}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 whitespace-nowrap animate-in fade-in zoom-in-95 duration-300 pointer-events-none">
+              <div className="px-4 py-2 rounded-full bg-[#161412]/95 backdrop-blur-md border border-amber-lamp/70 font-mono text-xs text-bone shadow-[0_0_25px_rgba(242,167,59,0.35)] flex items-center gap-2.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp animate-pulse" />
+                <span className="tracking-wide">{faceCaption}</span>
               </div>
             </div>
           )}
@@ -128,14 +130,12 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
               Explore Work ↓
             </a>
             <a
-              href="/resume.pdf"
-              target="_blank"
-              rel="noreferrer"
+              href="/resume"
               onMouseEnter={() => onTriggerDialogue?.('resumeDownload', dialogues.resumeDownload)}
               className="px-5 py-2.5 rounded-full border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer"
               data-cursor="RESUME"
             >
-              Resume [PDF] ↗
+              Curriculum Vitae / Resume ↗
             </a>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { DialogueToast } from './components/common/DialogueToast'
 import { LampIntro } from './components/intro/LampIntro'
 import { Home } from './components/routes/Home'
 import { CaseStudy } from './components/routes/CaseStudy'
+import { ResumeView } from './components/routes/ResumeView'
 
 export default function App() {
   const [introCompleted, setIntroCompleted] = useState(() => {
@@ -46,8 +47,8 @@ export default function App() {
         {/* Custom GSAP Physics Cursor (auto-disabled on touch) */}
         {!reducedEffects && <CustomCursor />}
 
-        {/* The Lamp Signature Preload + Hanging Cord + Light Front Reveal */}
-        {!introCompleted && (
+        {/* The Lamp Signature Preload + Hanging Cord + Light Front Reveal (Disabled on /resume) */}
+        {!introCompleted && window.location.pathname !== '/resume' && (
           <LampIntro onComplete={() => setIntroCompleted(true)} />
         )}
 
@@ -56,6 +57,7 @@ export default function App() {
 
         {/* Application Routes */}
         <Routes>
+          <Route path="/resume" element={<ResumeView />} />
           <Route
             path="/"
             element={
