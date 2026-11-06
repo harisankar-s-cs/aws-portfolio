@@ -1,0 +1,66 @@
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
+@import "@fontsource/dm-sans/400.css";
+@import "@fontsource/dm-sans/500.css";
+@import "@fontsource/dm-sans/700.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: #0B0A09;
+    color: #EDE6DA;
+    font-family: "DM Sans", system-ui, sans-serif;
+    scroll-behavior: auto; /* Let Lenis handle smooth scrolling */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Lenis smooth scrolling rules */
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-scrolling iframe {
+    pointer-events: none;
+  }
+
+  ::selection {
+    background-color: #F2A73B;
+    color: #0B0A09;
+  }
+}
+
+@layer utilities {
+  .hairline-b {
+    border-bottom: 1px solid #1F1D1A;
+  }
+  .hairline-t {
+    border-top: 1px solid #1F1D1A;
+  }
+  .hairline-l {
+    border-left: 1px solid #1F1D1A;
+  }
+  .hairline-r {
+    border-right: 1px solid #1F1D1A;
+  }
+  .hairline-all {
+    border: 1px solid #1F1D1A;
+  }
+}
