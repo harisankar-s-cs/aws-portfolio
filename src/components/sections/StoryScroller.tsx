@@ -15,7 +15,7 @@ export function StoryScroller() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [activeChapterIndex, setActiveChapterIndex] = useState(0)
 
-  const { currentFrame, setFrame, getCurrentImage } = useImageSequence({
+  const { currentFrame, setFrame, getCurrentImage, isInitialLoaded } = useImageSequence({
     frameCount: FRAME_COUNT,
     framePath: getFramePath,
     windowSize: 24,
@@ -29,20 +29,17 @@ export function StoryScroller() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) return
 
-    const proxy = { frame: 1 }
-
     const st = ScrollTrigger.create({
       trigger: container,
       start: 'top top',
-      end: '+=250%',
+      end: '+=300%', // Generous 300% viewport scroll distance for butter-smooth scrub
       pin: true,
-      scrub: 0.8, // Inertial scrub
+      scrub: 0.8, // Inertia scrub
       onUpdate: (self) => {
         const frameIndex = Math.round(1 + self.progress * (FRAME_COUNT - 1))
-        proxy.frame = frameIndex
         setFrame(frameIndex)
 
-        // Chapter progression: 0 to 0.33 -> Ch 1, 0.33 to 0.66 -> Ch 2, 0.66 to 1.0 -> Ch 3
+        // Chapter progression: 0..0.33 -> Ch 1, 0.33..0.66 -> Ch 2, 0.66..1.0 -> Ch 3
         const chapterIdx = Math.min(2, Math.floor(self.progress * 3))
         setActiveChapterIndex(chapterIdx)
       },
@@ -53,7 +50,7 @@ export function StoryScroller() {
     }
   }, [setFrame])
 
-  // DPR-Aware Canvas Drawing Loop with Cover Fit
+  // Draw frame on canvas (draws immediately on initial load and whenever frame updates)
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -69,7 +66,7 @@ export function StoryScroller() {
     canvas.height = rect.height * dpr
     ctx.scale(dpr, dpr)
 
-    // Calculate Cover-fit positioning
+    // Calculate Cover-fit
     const canvasRatio = rect.width / rect.height
     const imgRatio = img.width / img.height
     let drawWidth = rect.width
@@ -87,38 +84,39 @@ export function StoryScroller() {
 
     ctx.clearRect(0, 0, rect.width, rect.height)
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight)
-  }, [currentFrame, getCurrentImage])
+  }, [currentFrame, getCurrentImage, isInitialLoaded])
 
   const chapter = storyChapters[activeChapterIndex]
 
   return (
     <section ref={containerRef} className="relative h-screen w-full bg-background overflow-hidden select-none">
       
-      {/* Full-bleed Canvas for Image Sequence */}
+      {/* Full-bleed Canvas for Apple-Style Image Sequence */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full object-cover"
       />
 
-      {/* Subtle Dark Vignette & Hairline Borders */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/90 pointer-events-none" />
+      {/* Subtle Dark Vignette */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-transparent to-background/80 pointer-events-none" />
 
-      {/* Chapter Text Overlay (Editorial layout) */}
+      {/* Chapter Text Overlay */}
       <div className="relative z-10 h-full max-w-7xl mx-auto px-6 sm:px-12 flex flex-col justify-between py-12 pointer-events-none">
         
         {/* Top Header */}
         <div className="flex items-center justify-between font-mono text-xs text-muted uppercase tracking-widest hairline-b pb-4">
           <div className="flex items-center gap-2">
-            <span className="text-amber-lamp font-bold">// STORY SEQUENCE</span>
+            <span className="text-amber-lamp font-bold">// VIDEO-IN-MOTION SCROLL</span>
             <span>CHAPTER {chapter.number} OF 03</span>
           </div>
-          <div className="text-[10px] text-muted">
-            FRAME {currentFrame.toString().padStart(2, '0')} / {FRAME_COUNT} (SCRUB-DRIVEN)
+          <div className="flex items-center gap-3 text-[11px] text-bone">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp animate-pulse" />
+            <span>FRAME {currentFrame.toString().padStart(2, '0')} / {FRAME_COUNT}</span>
           </div>
         </div>
 
         {/* Center / Lower Content Card */}
-        <div className="max-w-xl space-y-4 my-auto bg-[#0B0A09]/85 backdrop-blur-md p-8 rounded-xl border border-hairlineLight shadow-2xl transition-all duration-700 pointer-events-auto">
+        <div className="max-w-xl space-y-4 my-auto bg-[#0E0D0B]/90 backdrop-blur-md p-8 sm:p-10 rounded-2xl border border-hairlineLight shadow-2xl transition-all duration-700 pointer-events-auto">
           <div className="flex items-center gap-2 font-mono text-xs text-amber-lamp uppercase tracking-wider">
             <span>{chapter.subtitle}</span>
           </div>
@@ -133,7 +131,7 @@ export function StoryScroller() {
 
           {chapter.metricValue && (
             <div className="pt-3 border-t border-hairline flex items-baseline gap-3">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-amber-lamp">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-amber-lamp font-mono">
                 {chapter.metricValue}
               </span>
               <span className="font-mono text-xs text-muted uppercase tracking-wider">
@@ -144,9 +142,9 @@ export function StoryScroller() {
         </div>
 
         {/* Bottom Technical Notice */}
-        <div className="flex items-center justify-between text-[10px] font-mono text-muted hairline-t pt-4">
-          <span>* Luminous kinetic sequence generated to specifications (36 WebP frames, sliding-window cache)</span>
-          <span className="text-amber-lamp">SCROLL TO CONTINUE</span>
+        <div className="flex items-center justify-between text-[11px] font-mono text-muted hairline-t pt-4">
+          <span>* Scroll up and down to scrub the 36-frame cinematic camera sequence</span>
+          <span className="text-amber-lamp animate-pulse">SCROLL TO ADVANCE SEQUENCE ↓</span>
         </div>
 
       </div>
