@@ -2,6 +2,8 @@
 import React, { useState, useRef } from 'react'
 import { personal } from '../../content/personal'
 import { dialogues } from '../../content/dialogues'
+import { ReliefPortraitScene } from '../3d/ReliefPortraitScene'
+import { useGpuTier } from '../../hooks/useGpuTier'
 
 interface HeroProps {
   onTriggerDialogue?: (key: string, quote: string) => void
@@ -12,23 +14,28 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
   const lastCaptionTimeRef = useRef<number>(0)
   const captionIndexRef = useRef<number>(0)
+  const gpuTier = useGpuTier()
 
   // Face hover interaction: after 600ms hovering portrait, show mono caption (8s cooldown)
-  const handleMouseEnterPortrait = () => {
+  const triggerFaceCaption = () => {
     const now = Date.now()
     if (now - lastCaptionTimeRef.current < 8000) {
       return
     }
 
-    hoverTimerRef.current = setTimeout(() => {
-      const line = dialogues.portraitHoverLines[captionIndexRef.current % dialogues.portraitHoverLines.length]
-      captionIndexRef.current++
-      lastCaptionTimeRef.current = Date.now()
-      setFaceCaption(line)
+    const line = dialogues.portraitHoverLines[captionIndexRef.current % dialogues.portraitHoverLines.length]
+    captionIndexRef.current++
+    lastCaptionTimeRef.current = Date.now()
+    setFaceCaption(line)
 
-      setTimeout(() => {
-        setFaceCaption(null)
-      }, 3000)
+    setTimeout(() => {
+      setFaceCaption(null)
+    }, 2800)
+  }
+
+  const handleMouseEnterPortrait = () => {
+    hoverTimerRef.current = setTimeout(() => {
+      triggerFaceCaption()
     }, 600)
   }
 
@@ -56,7 +63,7 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
       {/* Main 12-Column Grid */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-center my-auto py-12">
         
-        {/* Left Column: Lit Portrait (5 cols) */}
+        {/* Left Column: Lit 2.5D Relief Portrait (5 cols) */}
         <div className="md:col-span-5 relative group">
           <div
             onMouseEnter={handleMouseEnterPortrait}
@@ -65,19 +72,25 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
             className="relative w-full max-w-md aspect-[4/5] rounded-lg overflow-hidden border border-hairlineLight bg-[#141210] shadow-2xl cursor-pointer"
             data-cursor="HARISANKAR"
           >
-            <img
-              src="/profile.png"
-              alt="Harisankar S"
-              className="w-full h-full object-cover grayscale contrast-105 group-hover:grayscale-0 transition-all duration-700 ease-cinema-out"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/profile.jpg'
-              }}
-            />
+            {/* R3F WebGL 2.5D Relief Plane with Volumetric Spotlight & Postprocessing */}
+            {gpuTier.loaded && !gpuTier.isLowEnd ? (
+              <ReliefPortraitScene onFaceHover={triggerFaceCaption} />
+            ) : (
+              <img
+                src="/assets/portrait.webp"
+                alt="Harisankar S"
+                className="w-full h-full object-cover grayscale contrast-105 group-hover:grayscale-0 transition-all duration-700 ease-cinema-out"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/profile.png'
+                }}
+              />
+            )}
+
             {/* Subtle warm amber vignette */}
             <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent pointer-events-none" />
 
             <div className="absolute top-4 left-4 font-mono text-[10px] text-amber-lamp uppercase tracking-wider bg-background/90 px-2.5 py-0.5 rounded border border-hairlineLight">
-              Portrait // Harisankar S
+              Portrait // 2.5D Relief Shading
             </div>
           </div>
 

@@ -1,6 +1,6 @@
-# AWS Amplify Deployment Guide
+# AWS Amplify Gen 2 Deployment & Zero-Cost Guardrails Guide
 
-This portfolio is architected as a high-performance static SPA optimized for continuous deployment on **AWS Amplify Hosting**.
+This portfolio is built for continuous global deployment on **AWS Amplify Hosting (Gen 2)** with serverless backend capabilities (AWS Lambda, Amazon CloudFront, Amazon S3, and Amazon DynamoDB).
 
 ---
 
@@ -14,36 +14,53 @@ This portfolio is architected as a high-performance static SPA optimized for con
 
 1.  **Open AWS Amplify Console:**
     *   Navigate to [https://console.aws.amazon.com/amplify/](https://console.aws.amazon.com/amplify/).
-    *   Make sure your region is set to your preferred region (e.g., `us-east-1` or `ap-south-1`).
+    *   Ensure your preferred region is selected (e.g., `ap-south-1` or `us-east-1`).
 
 2.  **Create New App:**
-    *   Click the **Create new app** button.
-    *   Select **GitHub** as the Git repository provider and click **Next**.
-    *   Authorize AWS Amplify to access your GitHub account if prompted.
+    *   Click **Create new app**.
+    *   Select **GitHub** as your Git repository provider and click **Next**.
+    *   Authorize AWS Amplify to access your GitHub repository.
 
 3.  **Select Repository & Branch:**
-    *   Choose repository: `aws-portfolio` (or your chosen repository name).
-    *   Select branch: `main`.
+    *   Choose repository: `aws-portfolio` (or your chosen name).
+    *   Branch: `main`.
     *   Click **Next**.
 
 4.  **Confirm Build Settings:**
-    *   Amplify will automatically detect the [`amplify.yml`](./amplify.yml) file located in the root of the project.
-    *   Output directory: `dist`.
-    *   Build command: `npm run build`.
-    *   Click **Next** and then click **Save and deploy**.
+    *   Amplify will automatically detect the [`amplify.yml`](./amplify.yml) file in the root directory.
+    *   Backend deployment: `npx ampx pipeline-deploy`.
+    *   Frontend build: `npm run build` with output directory `dist`.
+    *   Click **Save and deploy**.
+
+Your application will build in ~2 minutes and deploy globally across CloudFront edge locations with automated SSL/TLS certificates via AWS Certificate Manager (ACM).
 
 ---
 
-## 3. What Happens Under the Hood
-1.  **Continuous Integration (CI):** Amplify spins up a managed Amazon Linux build container, runs `npm ci`, and executes `vite build`.
-2.  **Edge CDN Distribution:** Output files in `dist/` are automatically synchronized and broadcast to **Amazon CloudFront** edge Points of Presence worldwide.
-3.  **Global HTTPS & SSL:** An automated SSL certificate is provisioned via **AWS Certificate Manager (ACM)**.
-4.  **SPA Rewrites & Caching:** The custom rewrites in `amplify.yml` route all client-side navigation (`/work/:slug`) to `/index.html` with immutable caching on WebP frames, fonts, and hashed chunks.
+## 3. Local Development Sandbox (Amplify Gen 2)
+
+To test the live Lambda functions and DynamoDB tables locally:
+```bash
+npx ampx sandbox
+```
+This provisions ephemeral cloud resources for your local development session and outputs live endpoint URLs.
 
 ---
 
-## 4. Submitting to the Hackathon
-Once deployed:
-1. Copy your live AWS Amplify URL (e.g., `https://main.d123456789.amplifyapp.com`).
-2. Provide your public GitHub repository link.
-3. Submit your project write-up detailing the R3F shader, canvas sequence, and AWS Amplify architecture!
+## 4. Zero-Cost Guardrail: AWS Budgets Alert Setup
+
+To ensure you stay 100% within the AWS Free Tier, configure an automated budget alert:
+
+1. Open the [AWS Billing & Cost Management Console](https://console.aws.amazon.com/billing/).
+2. In the left navigation, click **Budgets** $\rightarrow$ click **Create budget**.
+3. Select **Zero spend budget** (or choose **Cost budget** and enter `$1.00 USD`).
+4. Set the budget name: `Zero-Spend-Portfolio-Alert`.
+5. Enter your email address to receive immediate alerts if any service exceeds $0.01.
+6. Click **Create budget**.
+
+---
+
+## 5. Security & Cost Guardrails Verified
+* **Least-Privilege IAM:** Lambda functions run with minimum necessary execution roles.
+* **No Frontend Secrets:** All API keys and environment variables are serverless-isolated.
+* **CORS & Throttling:** Strict origins and payload limits on contact endpoints.
+* **Year-Long Immutable Caching:** WebP depth maps, self-hosted fonts, and hashed chunks are cached at the edge, drastically reducing origin hits to S3.
