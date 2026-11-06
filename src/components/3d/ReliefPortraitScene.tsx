@@ -73,12 +73,12 @@ function ReliefPortraitMesh({ onFaceHover }: ReliefPortraitMeshProps) {
       {/* Subtle Warm Amber Accent Light */}
       <pointLight position={[1.2, 1.0, 1.0]} color="#F2A73B" intensity={0.6} />
 
-      {/* Crisp, Natural Relief Mesh */}
+      {/* Crisp, Natural Relief Mesh (Square 1:1 Frame Alignment) */}
       <mesh
         ref={meshRef}
         position={[0, 0, 0]}
       >
-        <planeGeometry args={[1.75, 1.8, 128, 128]} />
+        <planeGeometry args={[1.76, 1.76, 128, 128]} />
         <meshStandardMaterial
           map={colorMap}
           displacementMap={depthMap}
