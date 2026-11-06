@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const PROLOGUE_TEXT = `I engineer deep learning systems where mathematical rigor meets high-throughput production. From designing 26M-parameter hybrid Restormers for medical ultrasound restoration at NIT Calicut to optimizing Siamese Swin Transformers for satellite vision at KSREC, I specialize in bridging research-grade neural architectures with resilient AWS cloud infrastructure.`
+const PROLOGUE_TEXT = `I am an undergraduate computer science student fascinated by deep learning and cloud architecture. My journey revolves around understanding how vision models work under the hood—from exploring medical image restoration at NIT Calicut to satellite change detection at KSREC—and learning how to deploy real systems reliably on AWS. Still learning, experimenting, and building one step at a time.`
 
 export function Prologue() {
   const containerRef = useRef<HTMLDivElement>(null)

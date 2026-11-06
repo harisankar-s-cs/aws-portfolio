@@ -72,25 +72,22 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
             className="relative w-full max-w-md aspect-[4/5] rounded-lg overflow-hidden border border-hairlineLight bg-[#141210] shadow-2xl cursor-pointer"
             data-cursor="HARISANKAR"
           >
-            {/* R3F WebGL 2.5D Relief Plane with Volumetric Spotlight & Postprocessing */}
+            {/* R3F WebGL 2.5D Relief Plane with Volumetric Spotlight */}
             {gpuTier.loaded && !gpuTier.isLowEnd ? (
               <ReliefPortraitScene onFaceHover={triggerFaceCaption} />
             ) : (
               <img
                 src="/assets/portrait.webp"
                 alt="Harisankar S"
-                className="w-full h-full object-cover grayscale contrast-105 group-hover:grayscale-0 transition-all duration-700 ease-cinema-out"
+                className="w-full h-full object-cover transition-all duration-500 ease-cinema-out"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/profile.png'
                 }}
               />
             )}
 
-            {/* Subtle warm amber vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent pointer-events-none" />
-
             <div className="absolute top-4 left-4 font-mono text-[10px] text-amber-lamp uppercase tracking-wider bg-background/90 px-2.5 py-0.5 rounded border border-hairlineLight">
-              Portrait // 2.5D Relief Shading
+              Harisankar S.
             </div>
           </div>
 
@@ -121,24 +118,8 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
             {personal.shortBio}
           </p>
 
-          {/* Focus Disciplines */}
-          <div className="pt-4 flex flex-wrap items-center gap-6 text-xs font-mono text-muted">
-            <div className="flex items-center gap-2">
-              <span className="text-amber-lamp font-bold">// 01</span>
-              <span>Vision Transformers</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-amber-lamp font-bold">// 02</span>
-              <span>Medical Imaging Research</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-amber-lamp font-bold">// 03</span>
-              <span>AWS Cloud Deployment</span>
-            </div>
-          </div>
-
           {/* Quick Actions */}
-          <div className="pt-4 flex flex-wrap items-center gap-4 text-xs font-mono">
+          <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono">
             <a
               href="#work"
               className="px-5 py-2.5 rounded-full bg-amber-lamp text-background font-bold uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-lamp/20"
