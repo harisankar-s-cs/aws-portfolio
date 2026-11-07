@@ -57,6 +57,7 @@ export function Contact({ onTriggerDialogue }: ContactProps) {
         
         <button
           onClick={handleCopyEmail}
+          onMouseEnter={handleMouseEnterContact}
           className="text-left font-display text-3xl sm:text-4xl lg:text-5xl text-bone hover:text-amber-lamp transition-colors duration-300 font-normal tracking-tight break-all cursor-pointer group"
           data-cursor="COPY"
         >

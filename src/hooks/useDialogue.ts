@@ -1,11 +1,10 @@
 // src/hooks/useDialogue.ts
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 
 export interface DialogueToastState {
   message: string
   visible: boolean
-  x?: number
-  y?: number
+  source?: string
 }
 
 export function useDialogue() {
@@ -14,28 +13,34 @@ export function useDialogue() {
     visible: false
   })
 
-  const triggerDialogue = useCallback((key: string, quote: string, clientX?: number, clientY?: number) => {
-    try {
-      const storageKey = `dialogue_seen_${key}`
-      if (sessionStorage.getItem(storageKey)) {
-        return // Trigger only once per element per session
-      }
-      sessionStorage.setItem(storageKey, 'true')
+  // Timestamp tracking for cooldown per key (6 seconds cooldown instead of permanent session lockout)
+  const lastTriggerRef = useRef<Map<string, number>>(new Map())
+  const dismissTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-      setToast({
-        message: quote,
-        visible: true,
-        x: clientX,
-        y: clientY
-      })
+  const triggerDialogue = useCallback((key: string, quote: string) => {
+    const now = Date.now()
+    const lastTime = lastTriggerRef.current.get(key) || 0
 
-      // Auto dismiss after 2.2s as specified
-      setTimeout(() => {
-        setToast((prev) => ({ ...prev, visible: false }))
-      }, 2200)
-    } catch (e) {
-      // In case sessionStorage is blocked in private browsing
+    // Cooldown of 5.5 seconds per specific quote key to prevent jitter spam while staying repeatable
+    if (now - lastTime < 5500) {
+      return
     }
+    lastTriggerRef.current.set(key, now)
+
+    if (dismissTimerRef.current) {
+      clearTimeout(dismissTimerRef.current)
+    }
+
+    setToast({
+      message: quote,
+      visible: true,
+      source: key
+    })
+
+    // Display for 3.5s so it's comfortably readable
+    dismissTimerRef.current = setTimeout(() => {
+      setToast((prev) => ({ ...prev, visible: false }))
+    }, 3500)
   }, [])
 
   return { toast, triggerDialogue }

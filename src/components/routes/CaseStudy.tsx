@@ -140,6 +140,7 @@ export function CaseStudy({ onTriggerDialogue }: CaseStudyProps) {
         <div className="flex items-center gap-4">
           <button
             onMouseEnter={() => onTriggerDialogue?.('restrictedItem', dialogues.restrictedItem)}
+            onClick={() => onTriggerDialogue?.('restrictedItem', dialogues.restrictedItem)}
             className="text-muted hover:text-amber-lamp transition-colors cursor-help border border-hairline px-3 py-1 rounded"
             title="Institutional NDA / Peer Review restricted access"
           >

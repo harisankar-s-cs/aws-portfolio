@@ -21,6 +21,7 @@ export function Toolkit({ onTriggerDialogue }: ToolkitProps) {
       {/* Section Header */}
       <div 
         onMouseEnter={handleHeadingMouseEnter}
+        onClick={handleHeadingMouseEnter}
         className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-b pb-6 cursor-default"
       >
         <div className="space-y-2.5">

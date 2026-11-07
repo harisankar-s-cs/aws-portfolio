@@ -123,6 +123,7 @@ export function Hero({ onTriggerDialogue }: HeroProps) {
             <a
               href="/resume"
               onMouseEnter={() => onTriggerDialogue?.('resumeDownload', dialogues.resumeDownload)}
+              onClick={() => onTriggerDialogue?.('resumeDownload', dialogues.resumeDownload)}
               className="px-6 py-3 rounded-full border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer font-medium"
               data-cursor="RESUME"
             >

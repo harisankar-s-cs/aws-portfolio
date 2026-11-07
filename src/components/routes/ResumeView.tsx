@@ -5,9 +5,15 @@ import { personal } from '../../content/personal'
 import { journey } from '../../content/journey'
 import { projects } from '../../content/projects'
 import { toolkit } from '../../content/toolkit'
+import { dialogues } from '../../content/dialogues'
 
-export function ResumeView() {
+interface ResumeViewProps {
+  onTriggerDialogue?: (key: string, quote: string) => void
+}
+
+export function ResumeView({ onTriggerDialogue }: ResumeViewProps) {
   const handlePrint = () => {
+    onTriggerDialogue?.('resumeDownload', dialogues.resumeDownload)
     window.print()
   }
 
@@ -25,12 +31,13 @@ export function ResumeView() {
           to="/"
           className="text-muted hover:text-amber-lamp flex items-center gap-2 transition-colors cursor-pointer text-base font-medium"
         >
-          <span>← Return to Cinematic Portfolio</span>
+          <span>← Return to Portfolio</span>
         </Link>
 
         <div className="flex items-center gap-5">
           <button
             onClick={handlePrint}
+            onMouseEnter={() => onTriggerDialogue?.('resumeDownload', dialogues.resumeDownload)}
             className="px-6 py-3 rounded-full bg-amber-lamp text-background font-bold uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-lamp/20 text-sm"
           >
             Print / Save as PDF 📄
@@ -38,6 +45,7 @@ export function ResumeView() {
           <a
             href="/resume.pdf"
             download="Harisankar_S_Resume.pdf"
+            onMouseEnter={() => onTriggerDialogue?.('resumeDownload', dialogues.resumeDownload)}
             className="px-6 py-3 rounded-full border border-hairlineLight text-bone hover:border-amber-lamp hover:text-amber-lamp transition-all cursor-pointer text-sm font-medium"
           >
             Direct PDF Download ↗

@@ -57,7 +57,7 @@ export default function App() {
 
         {/* Application Routes */}
         <Routes>
-          <Route path="/resume" element={<ResumeView />} />
+          <Route path="/resume" element={<ResumeView onTriggerDialogue={triggerDialogue} />} />
           <Route
             path="/"
             element={
