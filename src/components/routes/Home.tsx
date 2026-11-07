@@ -59,7 +59,7 @@ export function Home({
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-6 2xl:gap-8 font-mono text-sm text-muted shrink-0">
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-6 2xl:gap-8 font-mono text-xs xl:text-sm text-muted shrink-0">
             <a href="#prologue" className="hover:text-bone transition-colors whitespace-nowrap">Prologue</a>
             <a href="#work" className="hover:text-bone transition-colors whitespace-nowrap">Selected Work</a>
             <a href="#toolkit" className="hover:text-bone transition-colors whitespace-nowrap">Toolkit</a>
