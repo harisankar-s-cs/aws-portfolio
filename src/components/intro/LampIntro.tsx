@@ -5,6 +5,7 @@ import { AmberPreloader } from './AmberPreloader'
 import { PullCordSwitch } from './PullCordSwitch'
 import { usePreloadAssets } from '../../hooks/usePreloadAssets'
 import { getLenis } from '../../hooks/useLenis'
+import { playFilamentHum, playSwitchClick, toggleSound, isSoundMuted } from '../../utils/sound'
 
 interface LampIntroProps {
   onComplete: () => void
@@ -16,6 +17,7 @@ export function LampIntro({ onComplete }: LampIntroProps) {
   const [lampIntensity, setLampIntensity] = useState(0) // 0 to 1
   const [lightFrontY, setLightFrontY] = useState(0) // 0 to 100%
   const [showSkip, setShowSkip] = useState(true)
+  const [soundEnabled, setSoundEnabled] = useState(!isSoundMuted())
   const containerRef = useRef<HTMLDivElement>(null)
 
   // When assets are preloaded, transition from 'loading' to 'ready'
@@ -33,6 +35,12 @@ export function LampIntro({ onComplete }: LampIntroProps) {
   const handleSwitchOn = (pulledByHand: boolean) => {
     if (phase !== 'ready') return
     setPhase('igniting')
+
+    // Trigger switch click and electrical filament hum
+    if (pulledByHand) {
+      playSwitchClick()
+    }
+    playFilamentHum()
 
     // Stop Lenis while light front travels
     try {
@@ -89,6 +97,14 @@ export function LampIntro({ onComplete }: LampIntroProps) {
     onComplete()
   }
 
+  const handleToggleAudio = () => {
+    const muted = toggleSound()
+    setSoundEnabled(!muted)
+    if (!muted) {
+      playSwitchClick()
+    }
+  }
+
   // Keyboard shortcut: Escape skips intro
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -111,7 +127,7 @@ export function LampIntro({ onComplete }: LampIntroProps) {
         pointerEvents: phase === 'spreading' && lightFrontY > 80 ? 'none' : 'auto',
       }}
     >
-      {/* Top Controls: Status & Always-Visible Skip Button */}
+      {/* Top Controls: Status, Sound Toggle & Always-Visible Skip Button */}
       <div className="absolute top-6 left-6 right-6 sm:top-10 sm:left-12 sm:right-12 z-50 flex items-center justify-between font-mono text-[11px] tracking-widest uppercase text-muted">
         <div className="flex items-center gap-2">
           <span
@@ -130,14 +146,24 @@ export function LampIntro({ onComplete }: LampIntroProps) {
           </span>
         </div>
 
-        {showSkip && (
+        <div className="flex items-center gap-3">
           <button
-            onClick={handleFinish}
-            className="border border-hairlineLight px-3 py-1 rounded text-bone hover:border-amber-lamp hover:text-amber-lamp transition-colors cursor-pointer"
+            onClick={handleToggleAudio}
+            className="border border-hairlineLight px-2.5 py-1 rounded text-bone hover:border-amber-lamp hover:text-amber-lamp transition-colors cursor-pointer text-xs"
+            title="Toggle sound effects"
           >
-            Skip [ESC]
+            {soundEnabled ? '🔊 Sound [ON]' : '🔇 Sound [OFF]'}
           </button>
-        )}
+
+          {showSkip && (
+            <button
+              onClick={handleFinish}
+              className="border border-hairlineLight px-3 py-1 rounded text-bone hover:border-amber-lamp hover:text-amber-lamp transition-colors cursor-pointer"
+            >
+              Skip [ESC]
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Real Preload Progress Hairline */}

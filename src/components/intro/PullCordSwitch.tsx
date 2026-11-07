@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import gsap from 'gsap'
 import { Draggable } from 'gsap/Draggable'
-import { Howl } from 'howler'
+import { playSwitchClick } from '../../utils/sound'
 
 gsap.registerPlugin(Draggable)
 
@@ -18,20 +18,7 @@ export function PullCordSwitch({ onSwitchOn, disabled }: PullCordSwitchProps) {
   const handleRef = useRef<HTMLButtonElement>(null)
   const [hintVisible, setHintVisible] = useState(true)
   const [pulledDistance, setPulledDistance] = useState(0)
-  const soundRef = useRef<Howl | null>(null)
   const triggeredRef = useRef(false)
-
-  // Initialize Howler sound
-  useEffect(() => {
-    soundRef.current = new Howl({
-      src: ['/assets/switch-click.wav'],
-      volume: 0.7,
-      preload: true,
-    })
-    return () => {
-      soundRef.current?.unload()
-    }
-  }, [])
 
   // 6-second auto-switch timer if idle
   useEffect(() => {
@@ -78,9 +65,8 @@ export function PullCordSwitch({ onSwitchOn, disabled }: PullCordSwitchProps) {
       if (triggeredRef.current) return
       triggeredRef.current = true
 
-      try {
-        soundRef.current?.play()
-      } catch (e) {}
+      // Play punchy mechanical switch click that persists across unmount
+      playSwitchClick()
 
       // Tactile snap animation
       gsap.to(handle, {
@@ -126,9 +112,8 @@ export function PullCordSwitch({ onSwitchOn, disabled }: PullCordSwitchProps) {
     if (triggeredRef.current) return
     triggeredRef.current = true
 
-    try {
-      soundRef.current?.play()
-    } catch (e) {}
+    // Play switch click
+    playSwitchClick()
 
     // Visual pull bounce
     gsap.to(handleRef.current, {
@@ -153,70 +138,73 @@ export function PullCordSwitch({ onSwitchOn, disabled }: PullCordSwitchProps) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-40 flex flex-col items-center justify-start pointer-events-none select-none overflow-hidden"
+      className="absolute inset-0 flex flex-col items-center justify-start pointer-events-auto select-none"
     >
-      {/* Hanging Lamp Silhouette */}
+      {/* Top Ceiling Lamp Fixture Silhouette */}
       <div
         ref={lampFixtureRef}
-        className="relative flex flex-col items-center pt-0 transition-opacity duration-1000"
+        className="relative z-30 flex flex-col items-center pt-0 transition-transform duration-500"
       >
-        {/* Top Ceiling Cord */}
-        <div className="w-[1.5px] h-20 sm:h-28 bg-gradient-to-b from-[#1C1A17] via-[#2A2722] to-[#3A352F]" />
+        {/* Metal Ceiling Mount Plate */}
+        <div className="w-16 h-2 rounded-b-md bg-[#221F1B] border-b border-[#3A352F] shadow-md" />
 
-        {/* Vintage Hanging Lamp Shade Silhouette */}
-        <div className="relative flex flex-col items-center">
-          {/* Top Socket Fitting */}
-          <div className="w-4 h-3 bg-[#24211C] rounded-t-sm border-t border-hairlineLight" />
-          
-          {/* Flared Conical Shade */}
-          <div className="w-24 sm:w-32 h-10 sm:h-12 bg-gradient-to-b from-[#1E1B17] to-[#12100E] rounded-b-xl border border-hairlineLight shadow-2xl relative flex items-center justify-center">
-            {/* Soft inner filament silhouette hint */}
-            <div className="w-2 h-2 rounded-full bg-amber-lamp/20 blur-[1px] absolute -bottom-1" />
+        {/* Vintage Hanging Rod */}
+        <div className="w-[3px] h-20 bg-gradient-to-b from-[#221F1B] via-[#2F2A24] to-[#1C1814]" />
+
+        {/* Brass Lamp Bell Dome Hood */}
+        <div className="relative -mt-1 flex flex-col items-center">
+          <div className="w-8 h-4 rounded-t-lg bg-[#3D352B] border-t border-[#6B5D4D]" />
+          <div className="w-44 h-18 rounded-b-full bg-[#181512] border border-[#2F2922] shadow-[0_10px_35px_rgba(0,0,0,0.8)] relative overflow-hidden">
+            <div className="absolute inset-x-4 top-1 h-[1px] bg-amber-lamp/20" />
+            <div className="absolute inset-x-8 bottom-2 h-[2px] bg-gradient-to-r from-transparent via-amber-lamp/30 to-transparent" />
+          </div>
+
+          {/* Bare Edison Bulb Filament Silhouette */}
+          <div className="w-9 h-12 -mt-2 rounded-b-full border border-amber-lamp/25 bg-[#0C0B0A] relative flex items-center justify-center shadow-[0_0_15px_rgba(242,167,59,0.1)]">
+            <div className="w-1.5 h-6 rounded-full border border-amber-lamp/35 opacity-40 animate-pulse" />
           </div>
         </div>
 
-        {/* Hanging Cord & Bead for Switching */}
-        <div
-          ref={cordRef}
-          className="relative flex flex-col items-center origin-top pointer-events-auto"
-        >
-          {/* Vertical Cord Line (extends dynamically when pulled) */}
+        {/* Hanging Switch Pull-Cord */}
+        <div ref={cordRef} className="relative flex flex-col items-center -mt-1 origin-top">
+          {/* Beaded Golden Chain */}
           <div
-            className="w-[1.5px] bg-[#3E3831] transition-all"
-            style={{ height: `${70 + pulledDistance}px` }}
+            className="w-[2px] bg-gradient-to-b from-amber-lamp/60 via-amber-lamp/40 to-amber-lamp/80 transition-all shadow-[0_0_8px_rgba(242,167,59,0.2)]"
+            style={{ height: `${90 + pulledDistance}px` }}
           />
 
-          {/* Draggable & Accessible Bead / Handle Button */}
+          {/* Weighted Brass Bell Bead Handle */}
           <button
             ref={handleRef}
             onClick={handleDirectActivation}
             onKeyDown={handleKeyDown}
-            aria-label="Pull cord to switch on the lamp"
             tabIndex={0}
-            className="group relative flex items-center justify-center w-8 h-10 -mt-1 cursor-grab active:cursor-grabbing focus:outline-none focus:ring-1 focus:ring-amber-lamp/60 rounded-full"
-            data-cursor="PULL"
+            aria-label="Pull to switch on lamp"
+            className="group relative -mt-0.5 focus:outline-none focus:ring-2 focus:ring-amber-lamp/80 rounded-full cursor-grab active:cursor-grabbing p-1"
           >
-            {/* Antique Brass Bead */}
-            <div className="w-3.5 h-5 rounded-full bg-gradient-to-b from-[#5C4D35] via-[#7A6746] to-[#423724] border border-[#8C7650]/40 shadow-lg group-hover:border-amber-lamp transition-colors" />
+            <div className="w-4 h-7 rounded-full bg-gradient-to-b from-[#8C6D3B] via-[#E5B560] to-[#594420] shadow-[0_4px_12px_rgba(0,0,0,0.9)] border border-amber-lamp/40 group-hover:brightness-125 transition-all flex flex-col items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-white/40 mb-1" />
+              <div className="w-2 h-[1px] bg-black/40" />
+            </div>
 
-            {/* Micro pull ring at the bottom */}
-            <div className="absolute -bottom-2 w-2.5 h-2.5 rounded-full border border-[#8C7650]/50" />
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full border border-amber-lamp/60 animate-ping opacity-75 pointer-events-none" />
           </button>
         </div>
-
-        {/* Pulsing Hint: "pull to switch on" */}
-        {hintVisible && (
-          <div className="mt-8 pointer-events-none text-center space-y-1 animate-pulse">
-            <span className="font-mono text-xs sm:text-sm text-bone/80 tracking-widest uppercase">
-              Pull to switch on
-            </span>
-            <p className="font-mono text-[10px] text-muted tracking-wider">
-              [ Drag cord ↓ or press Enter / Space ]
-            </p>
-          </div>
-        )}
-
       </div>
+
+      {/* Tactile Monospace Instruction Hint */}
+      {hintVisible && (
+        <div className="absolute top-[44vh] left-1/2 -translate-x-1/2 text-center space-y-2 pointer-events-none animate-in fade-in duration-1000">
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-bone/90 flex items-center justify-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp animate-pulse" />
+            <span>PULL TO SWITCH ON</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp animate-pulse" />
+          </div>
+          <p className="font-mono text-[11px] text-muted tracking-wider">
+            [ Drag cord ↓ or press Enter / Space ]
+          </p>
+        </div>
+      )}
     </div>
   )
 }

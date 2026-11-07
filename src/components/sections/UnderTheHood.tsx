@@ -266,40 +266,40 @@ export const data = defineData({ schema });`,
   }
 
   return (
-    <section id="under-the-hood" ref={containerRef} className="py-32 sm:py-44 px-6 sm:px-12 max-w-7xl mx-auto space-y-16">
+    <section id="under-the-hood" ref={containerRef} className="py-20 sm:py-28 px-6 sm:px-12 max-w-7xl mx-auto space-y-12">
       
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 hairline-b pb-8">
-        <div className="space-y-4">
-          <span className="font-mono text-base uppercase tracking-widest text-amber-lamp font-bold flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-lamp" />
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-b pb-6">
+        <div className="space-y-2.5">
+          <span className="font-mono text-xs sm:text-sm uppercase tracking-widest text-amber-lamp font-bold flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-amber-lamp" />
             <span>// CLOUD ARCHITECTURE & SYSTEM DESIGN</span>
           </span>
-          <h2 className="font-display text-6xl sm:text-8xl text-bone tracking-tight font-normal">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-bone tracking-tight font-normal">
             Under the Hood.
           </h2>
         </div>
-        <div className="flex flex-wrap items-center gap-3 font-mono text-sm sm:text-base">
+        <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs sm:text-sm">
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-muted font-medium">AWS Amplify Gen 2</span>
           </div>
           <span className="text-muted">•</span>
-          <span className="text-amber-lamp bg-[#171513] px-3.5 py-1.5 rounded-lg border border-hairlineLight font-bold text-sm">
+          <span className="text-amber-lamp bg-[#171513] px-3 py-1 rounded-md border border-hairlineLight font-bold text-xs">
             CloudFront + S3 + Lambda + DynamoDB
           </span>
         </div>
       </div>
 
       {/* Main Architecture Diagram Container */}
-      <div className="p-8 sm:p-14 rounded-2xl border border-hairlineLight bg-[#0E0D0B] space-y-14 shadow-2xl">
+      <div className="p-6 sm:p-10 rounded-2xl border border-hairlineLight bg-[#0E0D0B] space-y-10 shadow-2xl">
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="space-y-2.5">
-            <span className="font-mono text-sm sm:text-base text-amber-lamp uppercase tracking-wider font-bold">
-              System Topography • Click Any of the 6 Nodes Below to Inspect Real IaC Code
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <span className="font-mono text-xs sm:text-sm text-amber-lamp uppercase tracking-wider font-bold">
+              System Topography • Click Any Node to Inspect Real IaC Code
             </span>
-            <p className="font-sans text-lg sm:text-xl text-bone/90 max-w-3xl leading-relaxed">
+            <p className="font-sans text-sm sm:text-base text-bone/80 max-w-2xl leading-relaxed">
               Live request lifecycle from visitor DNS resolution through edge caching, microVM execution, and atomic state storage.
             </p>
           </div>
@@ -307,25 +307,25 @@ export const data = defineData({ schema });`,
           <button
             onClick={handleTraceRequest}
             disabled={isTracing}
-            className="px-8 py-4 rounded-full bg-amber-lamp text-background font-mono text-base font-bold uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer shadow-xl shadow-amber-lamp/25 disabled:opacity-50 self-start md:self-auto flex items-center gap-3"
+            className="px-6 py-3 rounded-full bg-amber-lamp text-background font-mono text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-lamp/20 disabled:opacity-50 self-start md:self-auto flex items-center gap-2.5"
             data-cursor="TRACE"
           >
             {isTracing ? (
               <>
-                <span className="h-2.5 w-2.5 rounded-full bg-background animate-ping" />
+                <span className="h-2 w-2 rounded-full bg-background animate-ping" />
                 <span>Tracing Packet...</span>
               </>
             ) : (
               <>
                 <span>Trace a Request</span>
-                <span className="text-lg">⚡</span>
+                <span className="text-base">⚡</span>
               </>
             )}
           </button>
         </div>
 
         {/* 6-Node Visual Architecture Flow */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {steps.map((step, idx) => {
             const isLit = activeStep >= idx || packetPosition === idx
             const isCurrentPacket = packetPosition === idx
@@ -344,27 +344,27 @@ export const data = defineData({ schema });`,
                     handleSelectNode(idx)
                   }
                 }}
-                className={`relative p-8 rounded-2xl border cursor-pointer transition-all duration-300 focus:outline-none ${
+                className={`relative p-6 rounded-xl border cursor-pointer transition-all duration-300 focus:outline-none ${
                   isSelected
-                    ? 'border-amber-lamp bg-[#1E1A14] ring-2 ring-amber-lamp shadow-2xl shadow-amber-lamp/25 scale-[1.02]'
+                    ? 'border-amber-lamp bg-[#1E1A14] ring-1 ring-amber-lamp shadow-xl shadow-amber-lamp/20 scale-[1.01]'
                     : isCurrentPacket
-                    ? 'border-amber-lamp bg-[#1A1610] ring-2 ring-amber-lamp/60 scale-[1.02]'
+                    ? 'border-amber-lamp bg-[#1A1610] ring-1 ring-amber-lamp/50 scale-[1.01]'
                     : isLit
-                    ? 'border-amber-lamp/40 bg-[#141210] hover:border-amber-lamp hover:scale-[1.01]'
+                    ? 'border-amber-lamp/40 bg-[#141210] hover:border-amber-lamp'
                     : 'border-hairline bg-[#0E0D0B] opacity-75 hover:opacity-100 hover:border-hairlineLight'
                 }`}
                 data-cursor="INSPECT"
               >
                 {/* Header */}
-                <div className="flex items-center justify-between font-mono text-sm hairline-b pb-3 mb-4">
-                  <span className={`font-bold text-base ${isLit || isSelected ? 'text-amber-lamp' : 'text-muted'}`}>
+                <div className="flex items-center justify-between font-mono text-xs hairline-b pb-2.5 mb-3">
+                  <span className={`font-bold ${isLit || isSelected ? 'text-amber-lamp' : 'text-muted'}`}>
                     // {step.number}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-hairline text-muted font-medium">
+                    <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border border-hairline text-muted font-medium">
                       {step.badge}
                     </span>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded transition-colors ${
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${
                       isSelected ? 'bg-amber-lamp text-background font-bold' : 'text-amber-lamp underline hover:text-amber-400'
                     }`}>
                       {isSelected ? 'Active ✓' : 'Inspect ↗'}
@@ -372,22 +372,22 @@ export const data = defineData({ schema });`,
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="font-display text-2xl sm:text-3xl text-bone font-normal">
+                <div className="space-y-1">
+                  <h3 className="font-display text-xl sm:text-2xl text-bone font-normal">
                     {step.title}
                   </h3>
-                  <div className="font-mono text-sm sm:text-base text-amber-lamp font-medium">
+                  <div className="font-mono text-xs text-amber-lamp font-medium">
                     {step.subtitle}
                   </div>
                 </div>
 
-                <p className="font-sans text-sm sm:text-base text-muted leading-relaxed pt-3">
+                <p className="font-sans text-xs sm:text-sm text-muted leading-relaxed pt-2">
                   {step.description}
                 </p>
 
                 {isCurrentPacket && (
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5 font-mono text-xs text-amber-lamp bg-amber-lamp/15 px-3 py-1 rounded-full border border-amber-lamp">
-                    <span className="h-2 w-2 rounded-full bg-amber-lamp animate-ping" />
+                  <div className="absolute top-3 right-3 flex items-center gap-1 font-mono text-[10px] text-amber-lamp bg-amber-lamp/15 px-2 py-0.5 rounded-full border border-amber-lamp">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-lamp animate-ping" />
                     PACKET HERE
                   </div>
                 )}
@@ -400,33 +400,33 @@ export const data = defineData({ schema });`,
         <div 
           ref={inspectorRef} 
           data-testid="architecture-code-inspector"
-          className="p-8 sm:p-12 rounded-2xl border-2 border-amber-lamp/80 bg-[#14120E] space-y-8 shadow-2xl transition-all duration-300"
+          className="p-6 sm:p-8 rounded-xl border border-amber-lamp/70 bg-[#14120E] space-y-6 shadow-2xl transition-all duration-300"
         >
           {/* Header Row */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 hairline-b pb-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs sm:text-sm text-amber-lamp font-bold uppercase tracking-wider bg-amber-lamp/10 border border-amber-lamp/40 px-3 py-1 rounded-md">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 hairline-b pb-4">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2.5">
+                <span className="font-mono text-[11px] text-amber-lamp font-bold uppercase tracking-wider bg-amber-lamp/10 border border-amber-lamp/40 px-2.5 py-0.5 rounded">
                   Active Cloud Node: {steps[selectedNode].number} / 06
                 </span>
                 <span className="font-mono text-xs text-muted">
                   File: <code className="text-bone font-bold">{steps[selectedNode].detail.filePath}</code>
                 </span>
               </div>
-              <h4 className="font-display text-3xl sm:text-4xl text-bone font-normal">
+              <h4 className="font-display text-2xl sm:text-3xl text-bone font-normal">
                 {steps[selectedNode].title} — Infrastructure as Code
               </h4>
             </div>
 
             {/* Quick Node Switcher Tabs */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {steps.map((s, idx) => (
                 <button
                   key={s.id}
                   onClick={() => handleSelectNode(idx)}
-                  className={`px-3.5 py-2 rounded-full font-mono text-xs sm:text-sm transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-full font-mono text-xs transition-all cursor-pointer ${
                     selectedNode === idx
-                      ? 'bg-amber-lamp text-background font-bold shadow-lg shadow-amber-lamp/20 scale-105'
+                      ? 'bg-amber-lamp text-background font-bold shadow-md scale-105'
                       : 'border border-hairlineLight text-muted hover:text-bone hover:border-amber-lamp'
                   }`}
                 >
@@ -437,68 +437,68 @@ export const data = defineData({ schema });`,
           </div>
 
           {/* Code Viewer Panel */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between font-mono text-xs sm:text-sm text-muted">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between font-mono text-xs text-muted">
               <span className="text-bone font-medium">{steps[selectedNode].detail.codeTitle}</span>
               <button
                 onClick={handleCopyCode}
-                className="flex items-center gap-2 px-3 py-1 rounded bg-[#1C1814] border border-hairline hover:border-amber-lamp text-amber-lamp transition-colors cursor-pointer text-xs font-bold"
+                className="flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#1C1814] border border-hairline hover:border-amber-lamp text-amber-lamp transition-colors cursor-pointer text-xs font-bold"
                 title="Copy snippet to clipboard"
               >
-                {copiedCode ? '✓ Copied to Clipboard' : '📋 Copy Code'}
+                {copiedCode ? '✓ Copied' : '📋 Copy Code'}
               </button>
             </div>
 
-            <pre className="p-6 sm:p-8 rounded-xl bg-[#090807] border border-hairlineLight overflow-x-auto font-mono text-sm sm:text-base text-amber-lamp/95 leading-relaxed selection:bg-amber-lamp selection:text-background shadow-inner">
+            <pre className="p-4 sm:p-5 rounded-lg bg-[#090807] border border-hairlineLight overflow-x-auto font-mono text-xs sm:text-sm text-amber-lamp/95 leading-relaxed selection:bg-amber-lamp selection:text-background shadow-inner">
               <code>{steps[selectedNode].detail.codeSnippet}</code>
             </pre>
           </div>
 
           {/* Architectural Rationale */}
-          <div className="font-sans text-base sm:text-lg text-muted pt-4 border-t border-hairline leading-relaxed flex flex-col sm:flex-row sm:items-baseline gap-3">
-            <span className="text-amber-lamp font-mono text-xs sm:text-sm font-bold uppercase tracking-wider shrink-0 bg-[#1C1814] px-3 py-1 rounded border border-hairline">
+          <div className="font-sans text-xs sm:text-sm text-muted pt-3 border-t border-hairline leading-relaxed flex flex-col sm:flex-row sm:items-baseline gap-2">
+            <span className="text-amber-lamp font-mono text-xs font-bold uppercase tracking-wider shrink-0 bg-[#1C1814] px-2.5 py-0.5 rounded border border-hairline">
               Design Rationale
             </span>
-            <span className="text-bone/85">{steps[selectedNode].detail.rationale}</span>
+            <span className="text-bone/80">{steps[selectedNode].detail.rationale}</span>
           </div>
         </div>
 
         {/* Telemetry Output Card */}
         {telemetry && (
-          <div className="p-8 rounded-2xl border border-hairlineLight bg-[#12100E] space-y-6 animate-in fade-in duration-300">
-            <div className="flex items-center justify-between font-mono text-sm sm:text-base">
+          <div className="p-6 rounded-xl border border-hairlineLight bg-[#12100E] space-y-4 animate-in fade-in duration-300">
+            <div className="flex items-center justify-between font-mono text-xs sm:text-sm">
               <span className="text-amber-lamp font-bold uppercase tracking-wider flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-lamp animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-amber-lamp animate-pulse" />
                 <span>// TELEMETRY DIAGNOSTIC PAYLOAD</span>
               </span>
-              <span className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm uppercase font-bold ${
+              <span className={`px-2.5 py-1 rounded-full text-xs uppercase font-bold ${
                 telemetry.isLive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-amber-lamp/10 text-amber-lamp border border-amber-lamp/30'
               }`}>
                 {telemetry.isLive ? 'LIVE CLOUD TELEMETRY' : 'STANDBY MODE'}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 font-mono text-sm sm:text-base pt-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs sm:text-sm pt-1">
               <div>
-                <span className="text-muted block text-xs uppercase tracking-wider">REGION</span>
-                <span className="text-bone font-bold text-base sm:text-lg">{telemetry.region}</span>
+                <span className="text-muted block text-[11px] uppercase tracking-wider">REGION</span>
+                <span className="text-bone font-bold text-sm sm:text-base">{telemetry.region}</span>
               </div>
               <div>
-                <span className="text-muted block text-xs uppercase tracking-wider">ROUNDTRIP</span>
-                <span className="text-amber-lamp font-bold text-base sm:text-lg">{telemetry.durationMs} ms</span>
+                <span className="text-muted block text-[11px] uppercase tracking-wider">ROUNDTRIP</span>
+                <span className="text-amber-lamp font-bold text-sm sm:text-base">{telemetry.durationMs} ms</span>
               </div>
               <div>
-                <span className="text-muted block text-xs uppercase tracking-wider">REQUEST ID</span>
-                <span className="text-bone truncate block text-xs sm:text-sm">{telemetry.requestId}</span>
+                <span className="text-muted block text-[11px] uppercase tracking-wider">REQUEST ID</span>
+                <span className="text-bone truncate block text-xs">{telemetry.requestId}</span>
               </div>
               <div>
-                <span className="text-muted block text-xs uppercase tracking-wider">TIMESTAMP</span>
-                <span className="text-muted truncate block text-xs sm:text-sm">{telemetry.timestamp.split('T')[1].replace('Z','')} UTC</span>
+                <span className="text-muted block text-[11px] uppercase tracking-wider">TIMESTAMP</span>
+                <span className="text-muted truncate block text-xs">{telemetry.timestamp.split('T')[1].replace('Z','')} UTC</span>
               </div>
             </div>
 
             {!telemetry.isLive && (
-              <p className="font-mono text-xs sm:text-sm text-muted pt-3 border-t border-hairline">
+              <p className="font-mono text-xs text-muted pt-2 border-t border-hairline">
                 * Note: Live request routing active when connected to the AWS Amplify Gen 2 backend via <code className="text-bone">npx ampx sandbox</code>.
               </p>
             )}

@@ -26,7 +26,7 @@ export function Prologue() {
       gsap.fromTo(
         words,
         {
-          opacity: 0.14,
+          opacity: 0.16,
           color: '#8C8275',
         },
         {
@@ -57,25 +57,25 @@ export function Prologue() {
     <section
       ref={containerRef}
       id="prologue"
-      className="relative py-40 sm:py-56 px-6 sm:px-12 max-w-6xl mx-auto select-none"
+      className="relative py-24 sm:py-32 px-6 sm:px-12 max-w-4xl mx-auto select-none"
     >
       {/* Top subtle light pool hint */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-amber-lamp/40 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-amber-lamp/35 to-transparent" />
 
-      <div className="space-y-10">
-        <div className="flex items-center gap-3 font-mono text-base uppercase tracking-widest text-amber-lamp font-bold">
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-lamp" />
+      <div className="space-y-8">
+        <div className="flex items-center gap-2.5 font-mono text-xs sm:text-sm uppercase tracking-widest text-amber-lamp font-bold">
+          <span className="h-2 w-2 rounded-full bg-amber-lamp" />
           <span>// PROLOGUE • THE INTENT</span>
         </div>
 
         <p
           ref={textRef}
-          className="font-display text-5xl sm:text-7xl lg:text-8xl text-bone/90 leading-[1.20] tracking-tight font-normal"
+          className="font-display text-2xl sm:text-3xl md:text-4xl text-bone/90 leading-[1.4] tracking-tight font-normal"
         >
           {wordSpans}
         </p>
 
-        <div className="pt-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6 font-mono text-base text-muted hairline-t">
+        <div className="pt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono text-xs text-muted hairline-t">
           <span>ACADEMIC FOUNDATION & CLOUD HORIZONS</span>
           <span className="text-amber-lamp font-mono font-bold">SCROLL TO EXPAND ↓</span>
         </div>

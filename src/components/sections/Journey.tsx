@@ -34,27 +34,27 @@ export function Journey() {
     : sections.filter((s) => s.key === filter)
 
   return (
-    <section id="journey" className="py-32 sm:py-44 px-6 sm:px-12 max-w-7xl mx-auto space-y-16">
+    <section id="journey" className="py-20 sm:py-28 px-6 sm:px-12 max-w-7xl mx-auto space-y-12">
       
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 hairline-b pb-8">
-        <div className="space-y-4">
-          <span className="font-mono text-base uppercase tracking-widest text-amber-lamp font-bold flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-b pb-6">
+        <div className="space-y-2.5">
+          <span className="font-mono text-xs sm:text-sm uppercase tracking-widest text-amber-lamp font-bold flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-amber-lamp" />
             <span>// EXPERIENCE & MILESTONES</span>
           </span>
-          <h2 className="font-display text-6xl sm:text-8xl text-bone tracking-tight font-normal">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-bone tracking-tight font-normal">
             The Trajectory.
           </h2>
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex flex-wrap items-center gap-3 font-mono text-base">
+        <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs sm:text-sm">
           <button
             onClick={() => setFilter('all')}
-            className={`px-5 py-2.5 rounded-full transition-all cursor-pointer font-medium ${
+            className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer font-medium ${
               filter === 'all'
-                ? 'bg-amber-lamp text-background font-bold shadow-lg shadow-amber-lamp/20 scale-105'
+                ? 'bg-amber-lamp text-background font-bold shadow-md'
                 : 'border border-hairlineLight text-muted hover:text-bone hover:border-amber-lamp'
             }`}
           >
@@ -62,9 +62,9 @@ export function Journey() {
           </button>
           <button
             onClick={() => setFilter('experience')}
-            className={`px-5 py-2.5 rounded-full transition-all cursor-pointer font-medium ${
+            className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer font-medium ${
               filter === 'experience'
-                ? 'bg-amber-lamp text-background font-bold shadow-lg shadow-amber-lamp/20 scale-105'
+                ? 'bg-amber-lamp text-background font-bold shadow-md'
                 : 'border border-hairlineLight text-muted hover:text-bone hover:border-amber-lamp'
             }`}
           >
@@ -72,9 +72,9 @@ export function Journey() {
           </button>
           <button
             onClick={() => setFilter('leadership')}
-            className={`px-5 py-2.5 rounded-full transition-all cursor-pointer font-medium ${
+            className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer font-medium ${
               filter === 'leadership'
-                ? 'bg-amber-lamp text-background font-bold shadow-lg shadow-amber-lamp/20 scale-105'
+                ? 'bg-amber-lamp text-background font-bold shadow-md'
                 : 'border border-hairlineLight text-muted hover:text-bone hover:border-amber-lamp'
             }`}
           >
@@ -82,9 +82,9 @@ export function Journey() {
           </button>
           <button
             onClick={() => setFilter('education')}
-            className={`px-5 py-2.5 rounded-full transition-all cursor-pointer font-medium ${
+            className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer font-medium ${
               filter === 'education'
-                ? 'bg-amber-lamp text-background font-bold shadow-lg shadow-amber-lamp/20 scale-105'
+                ? 'bg-amber-lamp text-background font-bold shadow-md'
                 : 'border border-hairlineLight text-muted hover:text-bone hover:border-amber-lamp'
             }`}
           >
@@ -94,51 +94,51 @@ export function Journey() {
       </div>
 
       {/* Separated Grouped Timeline Sections */}
-      <div className="space-y-20">
+      <div className="space-y-14">
         {activeSections.map((sec, secIdx) => (
-          <div key={sec.key} className="space-y-12">
+          <div key={sec.key} className="space-y-8">
             
             {/* Category Subsection Title */}
-            <div className="flex items-center justify-between pb-6 border-b border-hairline">
-              <div className="flex items-center gap-4">
-                <span className="font-mono text-base text-amber-lamp font-bold">// 0{secIdx + 1}</span>
-                <h3 className="font-display text-3xl sm:text-5xl text-bone font-normal">
+            <div className="flex items-center justify-between pb-4 border-b border-hairline">
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs sm:text-sm text-amber-lamp font-bold">// 0{secIdx + 1}</span>
+                <h3 className="font-display text-2xl sm:text-3xl text-bone font-normal">
                   {sec.title}
                 </h3>
               </div>
-              <span className="font-mono text-xs sm:text-sm uppercase tracking-wider text-muted px-3.5 py-1.5 rounded-lg border border-hairline bg-[#12100E] font-medium">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-muted px-2.5 py-1 rounded-md border border-hairline bg-[#12100E] font-medium">
                 {sec.badge}
               </span>
             </div>
 
-            {/* Vertical Timeline within this distinct category */}
-            <div className="relative border-l-2 border-hairline ml-4 sm:ml-8 pl-8 sm:pl-14 space-y-14">
+            {/* Vertical Timeline */}
+            <div className="relative border-l border-hairline ml-3 sm:ml-6 pl-6 sm:pl-10 space-y-10">
               {sec.items.map((item: JourneyItem, idx: number) => (
                 <div key={idx} className="relative group">
                   
                   {/* Timeline Dot */}
-                  <div className="absolute -left-[38px] sm:-left-[62px] top-2.5 h-4 w-4 rounded-full border-2 border-hairlineLight bg-background group-hover:bg-amber-lamp group-hover:border-amber-lamp transition-colors duration-300 shadow-md" />
+                  <div className="absolute -left-[31px] sm:-left-[47px] top-1.5 h-3 w-3 rounded-full border border-hairlineLight bg-background group-hover:bg-amber-lamp group-hover:border-amber-lamp transition-colors duration-300 shadow-md" />
 
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-3 font-mono text-sm sm:text-base">
+                  <div className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs">
                       <span className="text-amber-lamp font-bold">{item.year}</span>
                       <span className="text-muted">•</span>
                       <span className="text-muted uppercase tracking-wider">{item.period}</span>
                       <span className="text-muted">•</span>
-                      <span className="text-xs uppercase px-3 py-1 rounded border border-hairline text-muted font-medium bg-[#141210]">
+                      <span className="text-[10px] uppercase px-2 py-0.5 rounded border border-hairline text-muted font-medium bg-[#141210]">
                         {item.type}
                       </span>
                     </div>
 
-                    <h4 className="font-display text-2xl sm:text-4xl text-bone font-normal">
+                    <h4 className="font-display text-xl sm:text-2xl text-bone font-normal">
                       {item.title}
                     </h4>
 
-                    <div className="font-mono text-sm sm:text-base text-amber-lamp/80 font-medium">
+                    <div className="font-mono text-xs text-amber-lamp/80 font-medium">
                       {item.organization} — {item.location}
                     </div>
 
-                    <p className="font-sans text-base sm:text-lg text-bone/85 max-w-3xl leading-relaxed pt-2">
+                    <p className="font-sans text-xs sm:text-sm text-bone/80 max-w-2xl leading-relaxed pt-1">
                       {item.summary}
                     </p>
                   </div>
